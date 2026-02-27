@@ -4,7 +4,7 @@ from myLib.connect import connect
 from myLib.p1Settings import EPSG_CODE
 
 
-class ParquesOOP():
+class CorredoresOOP():
     def __init__(self):
         self.conn=connect()
         self.cur=self.conn.cursor()
@@ -15,20 +15,20 @@ class ParquesOOP():
 
     def insert(self):
         cons="""
-        INSERT INTO apm.parques 
-            (description, area, tipo, gestion, equipamiento, geom)
+        INSERT INTO apm.corredores 
+            (description,dist,tipo,ancho,iluminacion,geom)
         VALUES
             (%s,%s,%s,%s,%s,
             st_geometryFromText(%s,%s))
         RETURNING id
         """
         self.cur.execute(cons,
-                    ['My first park', #descripcion
-                    100, #area
-                    'Urbano', #tipo
-                    'Municipal', #gestion
-                    True, #equipamiento
-                    'POLYGON ((728682.04891478247009218 4373483.63257919624447823, 728696.39738427905831486 4373525.62809967342764139, 728839.88207924494054168 4373479.08306447695940733, 728812.93495360505767167 4373402.09127693437039852, 728729.99380066129378974 4373451.08605082519352436, 728682.04891478247009218 4373483.63257919624447823))',
+                    ['My second corr',
+                    120,
+                    'peatonal',
+                    2,
+                    True,
+                    'LINESTRING (728773.91411582741420716 4373270.24284076597541571, 727896.20773784175980836 4373567.71111082006245852)',
                     EPSG_CODE
                     ])
         self.conn.commit()
@@ -46,9 +46,9 @@ class ParquesOOP():
         
         cons="""
         SELECT 
-            id, description, area, tipo, gestion, equipamiento, st_astext(geom)
+            id,description,dist,tipo,ancho,iluminacion,st_astext(geom)
         FROM 
-            apm.parques 
+            apm.corredores 
         WHERE
             id>%s
         """
@@ -63,23 +63,23 @@ class ParquesOOP():
     def update(self):
         cons="""
             UPDATE
-                apm.parques 
+                apm.corredores 
             SET 
-                (description, area, tipo, gestion, equipamiento, geom) = ROW(%s,%s,%s,%s,%s, st_geometryFromText(%s,%s))    
+                (description,dist,tipo,ancho,iluminacion, geom) = ROW(%s,%s,%s,%s,%s, st_geometryFromText(%s,%s))    
             WHERE
-                id>%s
+                id=%s
             """
         # As there are 5 %s, you need a list with 5 values: 
         #   [description, area, the_geom_wkt, the_epsg_code, 
         #           the_id_to_select_the_row]
-        valuesList=['My second park', #descripcion
-                    100, #area
-                    'Urbano', #tipo
-                    'Municipal', #gestion
-                    True, #equipamiento
-                    'POLYGON ((728682.04891478247009218 4373483.63257919624447823, 728696.39738427905831486 4373525.62809967342764139, 728839.88207924494054168 4373479.08306447695940733, 728812.93495360505767167 4373402.09127693437039852, 728729.99380066129378974 4373451.08605082519352436, 728682.04891478247009218 4373483.63257919624447823))',
+        valuesList=['My second corr',
+                    120,
+                    'ciclovia',
+                    1.5,
+                    True,
+                    'LINESTRING (728773.91411582741420716 4373270.24284076597541571, 727896.20773784175980836 4373567.71111082006245852)',
                     EPSG_CODE,
-                    2 #where id
+                    3
                     ]
         self.cur.execute(cons, valuesList)
         print(self.cur.rowcount)
@@ -90,14 +90,14 @@ class ParquesOOP():
     def delete(self):
         cons="""
             DELETE FROM
-                apm.parques  
+                apm.corredores  
             WHERE
                 id=%s
             """
         # As there are 5 %s, you need a list with 5 values: 
         #   [description, area, the_geom_wkt, the_epsg_code, 
         #           the_id_to_select_the_row]
-        valuesList=[6]
+        valuesList=[1]
         self.cur.execute(cons, valuesList)
         print(self.cur.rowcount)
         self.conn.commit()

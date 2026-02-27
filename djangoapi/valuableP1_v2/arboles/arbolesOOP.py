@@ -8,6 +8,7 @@ class ArbolesOOP():
     def __init__(self):
         self.conn=connect()
         self.cur=self.conn.cursor()
+
     def disconnect(self):
         self.cur.close()
         self.conn.close()
@@ -15,15 +16,18 @@ class ArbolesOOP():
     def insert(self):
         cons="""
         INSERT INTO apm.arboles 
-            (description, especie, geom)
+            (description, especie, altura, estado, protegido, geom)
         VALUES
-            (%s,%s,
+            (%s,%s,%s,%s,%s,
             st_geometryFromText(%s,%s))
         RETURNING id
         """
         self.cur.execute(cons,
-                    ['My first tree',
+                    ['My secind tree',
                     'Manzano',
+                    10,
+                    'Bueno',
+                    True,
                     'POINT (728926.0603868915932253 4373197.45060526859015226)',
                     EPSG_CODE
                     ])
@@ -42,7 +46,7 @@ class ArbolesOOP():
         
         cons="""
         SELECT 
-            id, description, especie, st_astext(geom)
+            id, description, especie, altura, estado, protegido, st_astext(geom)
         FROM 
             apm.arboles 
         WHERE
@@ -61,18 +65,22 @@ class ArbolesOOP():
             UPDATE
                 apm.arboles 
             SET 
-                (description, especie, geom) = ROW(%s, %s, st_geometryFromText(%s,%s))    
+                (description, especie, altura, estado, protegido, geom) = ROW(%s, %s,%s,%s,%s, st_geometryFromText(%s,%s))    
             WHERE
-                id>%s
+                id=%s
             """
         # As there are 5 %s, you need a list with 5 values: 
         #   [description, area, the_geom_wkt, the_epsg_code, 
         #           the_id_to_select_the_row]
-        valuesList=['New description 2',
-                    'limon',
+        valuesList=['My second tree',
+                    'Manzano',
+                    10,
+                    'Bueno',
+                    True,
                     'POINT (728926.0603868915932253 4373197.45060526859015226)',
                     EPSG_CODE,
-                    6]
+                    8
+                    ]
         self.cur.execute(cons, valuesList)
         print(self.cur.rowcount)
         self.conn.commit()
@@ -95,5 +103,3 @@ class ArbolesOOP():
         self.conn.commit()
         self.disconnect()
         print("Deleted")
-
-            

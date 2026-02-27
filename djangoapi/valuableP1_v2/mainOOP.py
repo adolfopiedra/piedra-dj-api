@@ -1,6 +1,7 @@
 import sys
 from parques.parquesOOP import ParquesOOP
 from arboles.arbolesOOP import ArbolesOOP
+from corredores.corredoresOOP import CorredoresOOP
 
 def main():
     # sys.argv[0] es siempre el nombre del archivo (main.py)
@@ -32,8 +33,20 @@ def main():
             b.update()
         elif functionName=="delete":
             b.delete()
+
     elif tableName=="arboles":
         b=ArbolesOOP()
+        if functionName=="insert":
+            b.insert()
+        elif functionName=="select":
+            b.select()
+        elif functionName=="update":
+            b.update()
+        elif functionName=="delete":
+            b.delete()
+
+    elif tableName=="corredores":
+        b=CorredoresOOP()
         if functionName=="insert":
             b.insert()
         elif functionName=="select":
