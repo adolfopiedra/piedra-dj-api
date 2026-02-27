@@ -68,7 +68,11 @@ class ArbolesOOP():
         # As there are 5 %s, you need a list with 5 values: 
         #   [description, area, the_geom_wkt, the_epsg_code, 
         #           the_id_to_select_the_row]
-        valuesList=['New description 2','limon','POINT (728926.0603868915932253 4373197.45060526859015226)',EPSG_CODE, 0]
+        valuesList=['New description 2',
+                    'limon',
+                    'POINT (728926.0603868915932253 4373197.45060526859015226)',
+                    EPSG_CODE,
+                    6]
         self.cur.execute(cons, valuesList)
         print(self.cur.rowcount)
         self.conn.commit()
@@ -85,7 +89,7 @@ class ArbolesOOP():
         # As there are 5 %s, you need a list with 5 values: 
         #   [description, area, the_geom_wkt, the_epsg_code, 
         #           the_id_to_select_the_row]
-        valuesList=[3]
+        valuesList=[5]
         self.cur.execute(cons, valuesList)
         print(self.cur.rowcount)
         self.conn.commit()
