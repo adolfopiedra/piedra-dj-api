@@ -15,8 +15,8 @@ class ArbolesOOP():
 
     def insert(self):
         cons="""
-        INSERT INTO apm.arboles 
-            (description, especie, altura, estado, protegido, geom)
+        INSERT INTO apm.trees 
+            (description,species,height,condition,is_protected,geom)
         VALUES
             (%s,%s,%s,%s,%s,
             st_geometryFromText(%s,%s))
@@ -46,9 +46,9 @@ class ArbolesOOP():
         
         cons="""
         SELECT 
-            id, description, especie, altura, estado, protegido, st_astext(geom)
+            id, description,species,height,condition,is_protected,st_astext(geom)
         FROM 
-            apm.arboles 
+            apm.trees 
         WHERE
             id>%s
         """
@@ -63,9 +63,9 @@ class ArbolesOOP():
     def update(self):
         cons="""
             UPDATE
-                apm.arboles 
+                apm.trees 
             SET 
-                (description, especie, altura, estado, protegido, geom) = ROW(%s, %s,%s,%s,%s, st_geometryFromText(%s,%s))    
+                (description,species,height,condition,is_protected,geom) = ROW(%s, %s,%s,%s,%s, st_geometryFromText(%s,%s))    
             WHERE
                 id=%s
             """
@@ -90,7 +90,7 @@ class ArbolesOOP():
     def delete(self):
         cons="""
             DELETE FROM
-                apm.arboles  
+                apm.trees  
             WHERE
                 id=%s
             """

@@ -8,15 +8,15 @@ class CorredoresOOP():
     def __init__(self):
         self.conn=connect()
         self.cur=self.conn.cursor()
-        
+
     def disconnect(self):
         self.cur.close()
         self.conn.close()
 
     def insert(self):
         cons="""
-        INSERT INTO apm.corredores 
-            (description,dist,tipo,ancho,iluminacion,geom)
+        INSERT INTO apm.corridors 
+            (description,dist,type,width,lighting,geom)
         VALUES
             (%s,%s,%s,%s,%s,
             st_geometryFromText(%s,%s))
@@ -46,9 +46,9 @@ class CorredoresOOP():
         
         cons="""
         SELECT 
-            id,description,dist,tipo,ancho,iluminacion,st_astext(geom)
+            id,description,dist,type,width,lighting,st_astext(geom)
         FROM 
-            apm.corredores 
+            apm.corridors 
         WHERE
             id>%s
         """
@@ -63,9 +63,9 @@ class CorredoresOOP():
     def update(self):
         cons="""
             UPDATE
-                apm.corredores 
+                apm.corridors 
             SET 
-                (description,dist,tipo,ancho,iluminacion, geom) = ROW(%s,%s,%s,%s,%s, st_geometryFromText(%s,%s))    
+                (description,dist,type,width,lighting,geom) = ROW(%s,%s,%s,%s,%s, st_geometryFromText(%s,%s))    
             WHERE
                 id=%s
             """
@@ -90,7 +90,7 @@ class CorredoresOOP():
     def delete(self):
         cons="""
             DELETE FROM
-                apm.corredores  
+                apm.corridors  
             WHERE
                 id=%s
             """
@@ -103,5 +103,3 @@ class CorredoresOOP():
         self.conn.commit()
         self.disconnect()
         print("Deleted")
-
-            

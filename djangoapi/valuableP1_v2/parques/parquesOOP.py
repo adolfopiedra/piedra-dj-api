@@ -15,8 +15,8 @@ class ParquesOOP():
 
     def insert(self):
         cons="""
-        INSERT INTO apm.parques 
-            (description, area, tipo, gestion, equipamiento, geom)
+        INSERT INTO apm.parks 
+            (description, area, type, management, equipment, geom)
         VALUES
             (%s,%s,%s,%s,%s,
             st_geometryFromText(%s,%s))
@@ -46,9 +46,9 @@ class ParquesOOP():
         
         cons="""
         SELECT 
-            id, description, area, tipo, gestion, equipamiento, st_astext(geom)
+            id, description, area, type, management, equipment, st_astext(geom)
         FROM 
-            apm.parques 
+            apm.parks 
         WHERE
             id>%s
         """
@@ -63,9 +63,9 @@ class ParquesOOP():
     def update(self):
         cons="""
             UPDATE
-                apm.parques 
+                apm.parks 
             SET 
-                (description, area, tipo, gestion, equipamiento, geom) = ROW(%s,%s,%s,%s,%s, st_geometryFromText(%s,%s))    
+                (description, area, type, management, equipment, geom) = ROW(%s,%s,%s,%s,%s, st_geometryFromText(%s,%s))    
             WHERE
                 id>%s
             """
@@ -90,7 +90,7 @@ class ParquesOOP():
     def delete(self):
         cons="""
             DELETE FROM
-                apm.parques  
+                apm.parks  
             WHERE
                 id=%s
             """

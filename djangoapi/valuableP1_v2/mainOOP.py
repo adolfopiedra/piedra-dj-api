@@ -13,15 +13,15 @@ def main():
         print("Error: You mus give two parameters tableName and functionName to execute the addecuate function.")
         sys.exit(0)
 
-    if tableName not in ["parques", "arboles", "corredores"]:
-        print("Error: The available table names are parques, arboles, corredores")
+    if tableName not in ["parks", "trees", "corridors"]:
+        print("Error: The available table names are parks, trees, corridors")
         sys.exit(0)
     
     if functionName not in ["insert", "select", "selectAsDict", "update", "delete"]:
         print("Error the available function names are insert, select, delete or update")
         sys.exit(0)
 
-    if tableName == "parques":
+    if tableName == "parks":
         b=ParquesOOP()
         if functionName=="insert":
             b.insert()
@@ -34,7 +34,7 @@ def main():
         elif functionName=="delete":
             b.delete()
 
-    elif tableName=="arboles":
+    elif tableName=="trees":
         b=ArbolesOOP()
         if functionName=="insert":
             b.insert()
@@ -45,7 +45,7 @@ def main():
         elif functionName=="delete":
             b.delete()
 
-    elif tableName=="corredores":
+    elif tableName=="corridors":
         b=CorredoresOOP()
         if functionName=="insert":
             b.insert()
