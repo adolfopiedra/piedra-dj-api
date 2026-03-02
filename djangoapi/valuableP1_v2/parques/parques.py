@@ -51,7 +51,7 @@ class Parques():
             return {
                 "ok": False,
                 "message": str(e),
-                "data": []
+                "data": None
                 }
 
     def select(self, dict, asDict=False):
@@ -84,7 +84,7 @@ class Parques():
                 return {
                     "ok": False,
                     "message": "No data found",
-                    "data": []
+                    "data": None
                 }
         except Exception as e:
             self.conn.rollback()
@@ -92,7 +92,7 @@ class Parques():
             return {
                 "ok": False,
                 "message": str(e),
-                "data": []
+                "data": None
             }
 
     def update(self,dict):
@@ -132,8 +132,7 @@ class Parques():
                 return {
                     "ok": False,
                     "message": "No row found with that id",
-                    "data": [
-                    ]
+                    "data": None
                 }
         except Exception as e:
             self.conn.rollback()
@@ -142,7 +141,7 @@ class Parques():
             return {
                 "ok": False,
                 "message": str(e),
-                "data": []
+                "data": None
             }
 
     def delete(self,dict):
@@ -170,7 +169,7 @@ class Parques():
                 return {
                     "ok": False,
                     "message": "No row found with that id",
-                    "data": []
+                    "data": None
                 }
         except Exception as e:
             self.conn.rollback()
@@ -179,7 +178,7 @@ class Parques():
             return {
                 "ok": False,
                 "message": str(e),
-                "data": []
+                "data": None
             }
 
             
