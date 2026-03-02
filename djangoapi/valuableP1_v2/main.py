@@ -1,7 +1,8 @@
 import sys
-from parques.parques import Parques
-from arboles.arboles import Arboles
-from corredores.corredores import Corredores
+from parks.parks import Parks
+from trees.trees import Trees
+from corridors.corridors import Corridors
+
 park_insert_dict ={
            'description':'My first dict park',
            'area':1250,
@@ -81,7 +82,7 @@ def main():
         sys.exit(0)
 
     if tableName == "parks":
-        b=Parques()
+        b=Parks()
         if functionName=="insert":
             b.insert(park_insert_dict)
         elif functionName=="selectAsTuple":
@@ -94,7 +95,7 @@ def main():
             b.delete(park_delete_dict)
 
     elif tableName=="trees":
-        b=Arboles()
+        b=Trees()
         if functionName=="insert":
             b.insert(tree_insert_dict)
         elif functionName=="selectAsTuple":
@@ -107,7 +108,7 @@ def main():
             b.delete(tree_delete_dict)
 
     elif tableName=="corridors":
-        b=Corredores()
+        b=Corridors()
         if functionName=="insert":
             b.insert(corr_insert_dict)
         elif functionName=="selectAsTuple":

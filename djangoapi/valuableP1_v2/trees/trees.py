@@ -1,10 +1,9 @@
 from psycopg.rows import dict_row
-from pprint import pprint
 from myLib.connect import connect
 from myLib.p1Settings import EPSG_CODE
 
 
-class Corredores():
+class Trees():
     def __init__(self):
         self.conn=connect()
         self.cur=self.conn.cursor()
@@ -15,8 +14,8 @@ class Corredores():
 
     def insert(self,dict):
         cons="""
-        INSERT INTO apm.corridors 
-            (description,dist,type,width,lighting,geom)
+        INSERT INTO apm.trees 
+            (description,species,height,condition,is_protected,geom)
         VALUES
             (%s,%s,%s,%s,%s,
             st_geometryFromText(%s,%s))
@@ -25,34 +24,33 @@ class Corredores():
         try:
             self.cur.execute(cons,
                         [dict['description'],
-                        dict['dist'],
-                        dict['type'],
-                        dict['width'],
-                        dict['lighting'],
+                        dict['species'],
+                        dict['height'],
+                        dict['condition'],
+                        dict['is_protected'],
                         dict['geom'],
                         EPSG_CODE
                         ])
-            
             self.conn.commit()
             l=self.cur.fetchall()
             self.disconnect()
             #print(cur.fetchall()[0][0]) <-- ERROR. YOU ONLY CAN FECTH THE RESULTS ONCE
             #print(l)
             #print(l[0][0])
-            print('Inserted')
+            print("Inserted")
             print([{"id":l[0][0]}])
             return {
-            "ok": True,
-            "message": "Data inserted",
-            "data": [{"id":l[0][0]}]}
+                "ok": True,
+                "message": "Data inserted",
+                "data": [{"id":l[0][0]}]}
         except Exception as e:
-            self.conn.rollback()
-            self.disconnect()
-            return {
-                "ok": False,
-                "message": str(e),
-                "data": None
-                }
+                self.conn.rollback()
+                self.disconnect()
+                return {
+                    "ok": False,
+                    "message": str(e),
+                    "data": None
+                    }
 
     def select(self, dict, asDict=False):
         if asDict:
@@ -61,9 +59,9 @@ class Corredores():
         
         cons="""
         SELECT 
-            id,description,dist,type,width,lighting,st_astext(geom)
+            id, description,species,height,condition,is_protected,st_astext(geom)
         FROM 
-            apm.corridors 
+            apm.trees 
         WHERE
             id=%s
         """
@@ -95,12 +93,12 @@ class Corredores():
                 "data": None
             }
 
-    def update(self, dict):
+    def update(self,dict):
         cons="""
             UPDATE
-                apm.corridors 
+                apm.trees 
             SET 
-                (description,dist,type,width,lighting,geom) = ROW(%s,%s,%s,%s,%s, st_geometryFromText(%s,%s))    
+                (description,species,height,condition,is_protected,geom) = ROW(%s, %s,%s,%s,%s, st_geometryFromText(%s,%s))    
             WHERE
                 id=%s
             """
@@ -108,10 +106,10 @@ class Corredores():
         #   [description, area, the_geom_wkt, the_epsg_code, 
         #           the_id_to_select_the_row]
         valuesList=[dict['description'],
-                        dict['dist'],
-                        dict['type'],
-                        dict['width'],
-                        dict['lighting'],
+                        dict['species'],
+                        dict['height'],
+                        dict['condition'],
+                        dict['is_protected'],
                         dict['geom'],
                         EPSG_CODE,
                         dict['id']
@@ -148,7 +146,7 @@ class Corredores():
     def delete(self,dict):
         cons="""
             DELETE FROM
-                apm.corridors  
+                apm.trees  
             WHERE
                 id=%s
             """

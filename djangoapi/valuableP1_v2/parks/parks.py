@@ -4,7 +4,7 @@ from myLib.connect import connect
 from myLib.p1Settings import EPSG_CODE
 
 
-class Parques():
+class Parks():
     def __init__(self):
         self.conn=connect()
         self.cur=self.conn.cursor()
