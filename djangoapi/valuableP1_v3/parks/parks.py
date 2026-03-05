@@ -1,7 +1,7 @@
 from psycopg.rows import dict_row
 from pprint import pprint
 from myLib.connect import connect
-from myLib.p1Settings import EPSG_CODE
+from myLib.p1Settings import EPSG_CODE,SNAPTOGRIDDEC
 
 
 class Parks():
@@ -31,7 +31,7 @@ class Parks():
                         dict['equipment'], #equipamiento
                         dict['geom'],
                         EPSG_CODE,
-                        SNAPTOGRIPDEC
+                        SNAPTOGRIDDEC
                         ])
             
             self.conn.commit()
@@ -101,7 +101,7 @@ class Parks():
             UPDATE
                 apm.parks 
             SET 
-                (description, area, type, management, equipment, geom) = ROW(%s,%s,%s,%s,%s, st_snaptogrid(st_geometryFromText(%s,%s),0.0001)    
+                (description, area, type, management, equipment, geom) = ROW(%s,%s,%s,%s,%s, st_snaptogrid(st_geometryFromText(%s,%s),%s)    
             WHERE
                 id=%s
             """
@@ -115,6 +115,7 @@ class Parks():
                     dict['equipment'], #equipamiento
                     dict['geom'],
                     EPSG_CODE,
+                    SNAPTOGRIDDEC,
                     dict['id']]
         try:
             self.cur.execute(cons, valuesList)

@@ -4,34 +4,33 @@ from myLib.connect import connect
 from myLib.p1Settings import EPSG_CODE
 
 
-class Parks():
+class Corridors():
     def __init__(self):
         self.conn=connect()
         self.cur=self.conn.cursor()
-        
+
     def disconnect(self):
         self.cur.close()
         self.conn.close()
 
     def insert(self,dict):
         cons="""
-        INSERT INTO apm.parks 
-            (description, area, type, management, equipment, geom)
+        INSERT INTO apm.corridors 
+            (description,dist,type,width,lighting,geom)
         VALUES
             (%s,%s,%s,%s,%s,
-            st_snaptogrid(st_geometryFromText(%s,%s),%s))
+            st_geometryFromText(%s,%s))
         RETURNING id
         """
         try:
             self.cur.execute(cons,
-                        [dict['description'], #descripcion
-                        dict['area'], #area
-                        dict['type'], #tipo
-                        dict['management'], #gestion
-                        dict['equipment'], #equipamiento
+                        [dict['description'],
+                        dict['dist'],
+                        dict['type'],
+                        dict['width'],
+                        dict['lighting'],
                         dict['geom'],
-                        EPSG_CODE,
-                        SNAPTOGRIPDEC
+                        EPSG_CODE
                         ])
             
             self.conn.commit()
@@ -62,9 +61,9 @@ class Parks():
         
         cons="""
         SELECT 
-            id, description, area, type, management, equipment, st_astext(geom)
+            id,description,dist,type,width,lighting,st_astext(geom)
         FROM 
-            apm.parks 
+            apm.corridors 
         WHERE
             id=%s
         """
@@ -96,26 +95,27 @@ class Parks():
                 "data": None
             }
 
-    def update(self,dict):
+    def update(self, dict):
         cons="""
             UPDATE
-                apm.parks 
+                apm.corridors 
             SET 
-                (description, area, type, management, equipment, geom) = ROW(%s,%s,%s,%s,%s, st_snaptogrid(st_geometryFromText(%s,%s),0.0001)    
+                (description,dist,type,width,lighting,geom) = ROW(%s,%s,%s,%s,%s, st_geometryFromText(%s,%s))    
             WHERE
                 id=%s
             """
         # As there are 5 %s, you need a list with 5 values: 
         #   [description, area, the_geom_wkt, the_epsg_code, 
         #           the_id_to_select_the_row]
-        valuesList=[dict['description'], #descripcion
-                    dict['area'], #area
-                    dict['type'], #tipo
-                    dict['management'], #gestion
-                    dict['equipment'], #equipamiento
-                    dict['geom'],
-                    EPSG_CODE,
-                    dict['id']]
+        valuesList=[dict['description'],
+                        dict['dist'],
+                        dict['type'],
+                        dict['width'],
+                        dict['lighting'],
+                        dict['geom'],
+                        EPSG_CODE,
+                        dict['id']
+                        ]
         try:
             self.cur.execute(cons, valuesList)
             affected_rows = self.cur.rowcount
@@ -148,7 +148,7 @@ class Parks():
     def delete(self,dict):
         cons="""
             DELETE FROM
-                apm.parks  
+                apm.corridors  
             WHERE
                 id=%s
             """
@@ -181,5 +181,3 @@ class Parks():
                 "message": str(e),
                 "data": None
             }
-
-            
