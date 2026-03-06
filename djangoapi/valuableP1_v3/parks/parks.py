@@ -1,19 +1,16 @@
 from psycopg.rows import dict_row
-from pprint import pprint
-from myLib.connect import connect
+#from myLib.connect import connect
 from myLib.p1Settings import EPSG_CODE,SNAPTOGRIDDEC
+from myLib.database import Database as Db
 
 
-class Parks():
+class Parks(Db):
     def __init__(self):
-        self.conn=connect()
-        self.cur=self.conn.cursor()
+        super().__init__()
         
-    def disconnect(self):
-        self.cur.close()
-        self.conn.close()
-
     def insert(self,dict):
+        Db.is_valid(self,dict['geom'])
+        Db.check_intersection(self,dict['geom'])
         cons="""
         INSERT INTO apm.parks 
             (description, area, type, management, equipment, geom)
@@ -33,15 +30,11 @@ class Parks():
                         EPSG_CODE,
                         SNAPTOGRIDDEC
                         ])
-            
             self.conn.commit()
             l=self.cur.fetchall()
-            self.disconnect()
-            #print(cur.fetchall()[0][0]) <-- ERROR. YOU ONLY CAN FECTH THE RESULTS ONCE
-            #print(l)
-            #print(l[0][0])
             print('Inserted')
             print([{"id":l[0][0]}])
+            self.disconnect()
             return {
             "ok": True,
             "message": "Data inserted",
@@ -97,17 +90,16 @@ class Parks():
             }
 
     def update(self,dict):
+        Db.is_valid(self,dict['geom'])
+        Db.check_intersection(self,dict['geom'],dict['id'],command='update')
         cons="""
             UPDATE
                 apm.parks 
             SET 
-                (description, area, type, management, equipment, geom) = ROW(%s,%s,%s,%s,%s, st_snaptogrid(st_geometryFromText(%s,%s),%s)    
+                (description, area, type, management, equipment, geom) = ROW(%s,%s,%s,%s,%s, st_snaptogrid(st_geometryFromText(%s,%s),%s))    
             WHERE
                 id=%s
             """
-        # As there are 5 %s, you need a list with 5 values: 
-        #   [description, area, the_geom_wkt, the_epsg_code, 
-        #           the_id_to_select_the_row]
         valuesList=[dict['description'], #descripcion
                     dict['area'], #area
                     dict['type'], #tipo
@@ -117,29 +109,32 @@ class Parks():
                     EPSG_CODE,
                     SNAPTOGRIDDEC,
                     dict['id']]
+        
         try:
             self.cur.execute(cons, valuesList)
             affected_rows = self.cur.rowcount
             self.conn.commit()
-            self.disconnect()
 
             if affected_rows > 0:
-                print([{f'rows_updated:{affected_rows}'}])
+                print([{f'rows_updated:{affected_rows}, id:{dict['id']}'}])
+                self.disconnect()
                 return {
                     "ok": True,
                     "message": "Data updated",
                     "data": [{f'rows_updated:{affected_rows}'}]
                 }
             else:
+                print('No row found with that id')
+                self.disconnect()
                 return {
                     "ok": False,
                     "message": "No row found with that id",
                     "data": None
                 }
         except Exception as e:
+            print(f'Error: {e}')
             self.conn.rollback()
             self.disconnect()
-
             return {
                 "ok": False,
                 "message": str(e),
@@ -160,14 +155,18 @@ class Parks():
             self.cur.execute(cons, [dict['id']])
             affected_rows = self.cur.rowcount
             self.conn.commit()
-            self.disconnect()
+            
             if affected_rows > 0:
+                print(f'id:{dict['id']} Deleted')
+                self.disconnect()
                 return {
                     "ok": True,
                     "message": "Data deleted",
                     "data": [{"rows_deleted": affected_rows}]
                 }
             else:
+                print('No row found with that id')
+                self.disconnect()
                 return {
                     "ok": False,
                     "message": "No row found with that id",

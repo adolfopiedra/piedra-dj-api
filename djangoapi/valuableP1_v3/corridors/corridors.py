@@ -1,25 +1,24 @@
 from psycopg.rows import dict_row
+from psycopg import sql
 from pprint import pprint
 from myLib.connect import connect
-from myLib.p1Settings import EPSG_CODE
+from myLib.p1Settings import EPSG_CODE, SNAPTOGRIDDEC
+from myLib.database import Database as Db
 
 
-class Corridors():
+class Corridors(Db):
     def __init__(self):
-        self.conn=connect()
-        self.cur=self.conn.cursor()
-
-    def disconnect(self):
-        self.cur.close()
-        self.conn.close()
+        super().__init__()
 
     def insert(self,dict):
+        Db.is_valid(self,dict['geom'])
+        Db.check_intersection(self,dict['geom'])
         cons="""
         INSERT INTO apm.corridors 
             (description,dist,type,width,lighting,geom)
         VALUES
             (%s,%s,%s,%s,%s,
-            st_geometryFromText(%s,%s))
+            st_snaptogrid(st_geometryFromText(%s,%s),%s))
         RETURNING id
         """
         try:
@@ -30,15 +29,13 @@ class Corridors():
                         dict['width'],
                         dict['lighting'],
                         dict['geom'],
-                        EPSG_CODE
+                        EPSG_CODE,
+                        SNAPTOGRIDDEC
                         ])
-            
             self.conn.commit()
             l=self.cur.fetchall()
             self.disconnect()
-            #print(cur.fetchall()[0][0]) <-- ERROR. YOU ONLY CAN FECTH THE RESULTS ONCE
-            #print(l)
-            #print(l[0][0])
+
             print('Inserted')
             print([{"id":l[0][0]}])
             return {
@@ -46,6 +43,7 @@ class Corridors():
             "message": "Data inserted",
             "data": [{"id":l[0][0]}]}
         except Exception as e:
+            print(f'Error: {e}')
             self.conn.rollback()
             self.disconnect()
             return {
@@ -96,6 +94,8 @@ class Corridors():
             }
 
     def update(self, dict):
+        Db.is_valid(self,dict['geom'])
+        Db.check_intersection(self,dict['geom'],dict['id'],command='update')
         cons="""
             UPDATE
                 apm.corridors 
