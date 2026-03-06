@@ -13,85 +13,46 @@ class Corridors(Db):
     def insert(self,dict):
         Db.is_valid(self,dict['geom'])
         Db.check_intersection(self,dict['geom'])
-        cons="""
-        INSERT INTO apm.corridors 
-            (description,dist,type,width,lighting,geom)
-        VALUES
-            (%s,%s,%s,%s,%s,
-            st_snaptogrid(st_geometryFromText(%s,%s),%s))
-        RETURNING id
-        """
-        try:
-            self.cur.execute(cons,
-                        [dict['description'],
-                        dict['dist'],
-                        dict['type'],
-                        dict['width'],
-                        dict['lighting'],
-                        dict['geom'],
-                        EPSG_CODE,
-                        SNAPTOGRIDDEC
-                        ])
-            self.conn.commit()
-            l=self.cur.fetchall()
-            self.disconnect()
+        Db.insert(self,'apm.corridors',dict)
 
-            print('Inserted')
-            print([{"id":l[0][0]}])
-            return {
-            "ok": True,
-            "message": "Data inserted",
-            "data": [{"id":l[0][0]}]}
-        except Exception as e:
-            print(f'Error: {e}')
-            self.conn.rollback()
-            self.disconnect()
-            return {
-                "ok": False,
-                "message": str(e),
-                "data": None
-                }
+        # cons="""
+        # INSERT INTO apm.corridors 
+        #     (description,dist,type,width,lighting,geom)
+        # VALUES
+        #     (%s,%s,%s,%s,%s,
+        #     st_snaptogrid(st_geometryFromText(%s,%s),%s))
+        # RETURNING id
+        # """
+        # try:
+        #     self.cur.execute(cons,
+        #                 [dict['description'],
+        #                 dict['dist'],
+        #                 dict['type'],
+        #                 dict['width'],
+        #                 dict['lighting'],
+        #                 dict['geom'],
+        #                 EPSG_CODE,
+        #                 SNAPTOGRIDDEC
+        #                 ])
+        #     self.conn.commit()
+        #     l=self.cur.fetchall()
+        #     self.disconnect()
 
-    def select(self, dict, asDict=False):
-        if asDict:
-            #The rows are dicts
-            self.cur=self.conn.cursor(row_factory=dict_row)
-        
-        cons="""
-        SELECT 
-            id,description,dist,type,width,lighting,st_astext(geom)
-        FROM 
-            apm.corridors 
-        WHERE
-            id=%s
-        """
-        try:
-            self.cur.execute(cons, [dict['id']])
-            l=self.cur.fetchall()
-            self.disconnect()
-            if len(l)>0:
-                print(f"{len(l)} Selected")
-                print(l)
-                return {
-                    "ok": True,
-                    "message": "Data retrieved",
-                    "data": l
-                }
-            else:
-                print(f"{len(l)} Selected")
-                return {
-                    "ok": False,
-                    "message": "No data found",
-                    "data": None
-                }
-        except Exception as e:
-            self.conn.rollback()
-            self.disconnect()
-            return {
-                "ok": False,
-                "message": str(e),
-                "data": None
-            }
+        #     print('Inserted')
+        #     print([{"id":l[0][0]}])
+        #     return {
+        #     "ok": True,
+        #     "message": "Data inserted",
+        #     "data": [{"id":l[0][0]}]}
+        # except Exception as e:
+        #     print(f'Error: {e}')
+        #     self.conn.rollback()
+        #     self.disconnect()
+        #     return {
+        #         "ok": False,
+        #         "message": str(e),
+        #         "data": None
+        #         }
 
     def update(self, dict):
         Db.is_valid(self,dict['geom'])
@@ -145,39 +106,9 @@ class Corridors(Db):
                 "data": None
             }
 
+    def select(self, dict, asDict=False):
+        fields = 'id,description,dist,type,width,lighting,st_astext(geom)'
+        Db.select(self,'apm.corridors',fields,dict['id'],asDict)
+    
     def delete(self,dict):
-        cons="""
-            DELETE FROM
-                apm.corridors  
-            WHERE
-                id=%s
-            """
-        # As there are 5 %s, you need a list with 5 values: 
-        #   [description, area, the_geom_wkt, the_epsg_code, 
-        #           the_id_to_select_the_row]
-        try:
-            self.cur.execute(cons, [dict['id']])
-            affected_rows = self.cur.rowcount
-            self.conn.commit()
-            self.disconnect()
-            if affected_rows > 0:
-                return {
-                    "ok": True,
-                    "message": "Data deleted",
-                    "data": [{"rows_deleted": affected_rows}]
-                }
-            else:
-                return {
-                    "ok": False,
-                    "message": "No row found with that id",
-                    "data": None
-                }
-        except Exception as e:
-            self.conn.rollback()
-            self.disconnect()
-
-            return {
-                "ok": False,
-                "message": str(e),
-                "data": None
-            }
+        Db.delete(self,table='apm.corridors',id=dict['id'])
