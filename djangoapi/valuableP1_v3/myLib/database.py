@@ -1,7 +1,6 @@
 from psycopg.rows import dict_row
 from myLib import p1Settings
-from myLib.p1Settings import EPSG_CODE
-from myLib.p1Settings import SNAPTOGRIDDEC
+from myLib.p1Settings import EPSG_CODE,POSTGRES_SQUEMA,SNAPTOGRIDDEC
 import sys
 import psycopg
 from psycopg import sql
@@ -11,8 +10,8 @@ class Database():
         self.conn=self.connect()
         self.cur=self.conn.cursor()
 
-   
     #User Methods
+    #Conections to the database
     def connect(self):
         conn= psycopg.connect(
             dbname=p1Settings.POSTGRES_DB,
@@ -29,6 +28,7 @@ class Database():
         self.conn.close()
         print('Disconnected')
 
+    #General Methods
     def insert(self,table,dict):
         cols = [k for k in dict.keys() if k != 'geom']
         col_string = ",".join(cols) + ",geom"
@@ -48,7 +48,7 @@ class Database():
             self.cur.execute(cons, values)
             self.conn.commit()
             new_id = self.cur.fetchall()[0][0]
-            print(f'Inserted, id:{new_id}')
+            print(f'Inserted. id:{new_id}')
             self.disconnect()
 
             return {
@@ -58,6 +58,7 @@ class Database():
             }
 
         except Exception as e:
+            print(f'Error:{e}')
             self.conn.rollback()
             self.disconnect()
 
@@ -67,19 +68,60 @@ class Database():
                 "data": None
             }
 
+    def update(self,table,dict):
+        cols = [k for k in dict.keys() if k not in ['geom','id']]
+        val_string = ",".join([f"{c}=%s" for c in cols]) + ",geom=ST_SnapToGrid(ST_GeomFromText(%s,%s),%s)"
+        cons = f"""
+            UPDATE {table}
+            SET
+            {val_string}
+            WHERE id=%s
+        """
+        values = [dict[c] for c in cols] + [dict['geom'], EPSG_CODE, SNAPTOGRIDDEC, dict['id']]
+        try:
+            self.cur.execute(cons, values)
+            self.conn.commit()
+            affected_rows = self.cur.rowcount
+        
+            if affected_rows > 0:
+                print(f'rows_updated:{affected_rows}')
+                self.disconnect()
+                return {
+                    "ok": True,
+                    "message": "Data updated",
+                    "data": [{"rows_updated": affected_rows}]
+                }
+            else:
+                self.disconnect()
+                return {
+                    "ok": False,
+                    "message": "No row found with that id",
+                    "data": None
+                }
+
+        except Exception as e:
+            print(f'Error: {e}')
+            self.conn.rollback()
+            self.disconnect()
+
+            return {
+                "ok": False,
+                "message": str(e),
+                "data": None
+            }          
 
     def select(self,table,fields,id,asDict):
         if asDict:
             #The rows are dicts
             self.cur=self.conn.cursor(row_factory=dict_row)
         cons=f"""
-        SELECT 
-            {fields}
-        FROM 
-            {table} 
-        WHERE
-            id=%s
-        """
+            SELECT 
+                {fields}
+            FROM 
+                {table} 
+            WHERE
+                id=%s
+            """
         try:
             self.cur.execute(cons, [id])
             l=self.cur.fetchall()
@@ -131,6 +173,7 @@ class Database():
                 }
             else:
                 print(f"No row found with that id")
+                self.disconnect()
                 return {
                     "ok": False,
                     "message": "No row found with that id",
@@ -146,6 +189,7 @@ class Database():
                 "data": None
             }
 
+    #Check Topology Methods
     def is_valid(self,geom):
         #check if the geometry is valid after having simplified it
         cons ="""
@@ -174,7 +218,7 @@ class Database():
             self.disconnect()
             sys.exit()
     
-    def check_intersection(self,geom,id=None,command='insert'):
+    def check_intersection(self,geom,table,id=None,command='insert'):
         cons = """SELECT GeometryType(ST_GeomFromText(%s,%s))"""
         self.cur.execute(cons,[geom, EPSG_CODE])
         gtype = self.cur.fetchone()[0]
@@ -182,8 +226,8 @@ class Database():
         if gtype == 'POLYGON':
             #check if the geometry intersects any existing geometry
             if command  == 'update':
-                cons ="""
-                    select id from apm.parks where ST_relate(
+                cons =f"""
+                    select id from {table} where ST_relate(
                     geom,
                     st_snaptogrid(
                     st_geomfromtext(%s, %s),
@@ -196,8 +240,8 @@ class Database():
                             p1Settings.SNAPTOGRIDDEC,
                             id]
             else: 
-                cons ="""
-                    select id from apm.parks where ST_relate(
+                cons =f"""
+                    select id from {table} where ST_relate(
                     geom,
                     st_snaptogrid(
                     st_geomfromtext(%s, %s),
@@ -224,9 +268,9 @@ class Database():
         
         elif gtype == 'LINESTRING':
             if command  == 'update':
-                cons = """
+                cons = f"""
                         SELECT id
-                        FROM apm.corridors
+                        FROM {table}
                         WHERE ST_Intersects(
                             geom,
                             st_snaptogrid(
@@ -240,9 +284,9 @@ class Database():
                             p1Settings.SNAPTOGRIDDEC,
                             id]
             else:
-                cons = """
+                cons = f"""
                         SELECT id
-                        FROM apm.corridors
+                        FROM {table}
                         WHERE ST_Intersects(
                             geom,
                             st_snaptogrid(
@@ -270,51 +314,80 @@ class Database():
             
         elif gtype == 'POINT':
             if command  == 'update':
-                cons = """
+                cons = f"""
                         SELECT
                             EXISTS (
                                 SELECT 1
-                                FROM apm.parks
-                                WHERE ST_Within(st_snaptogrid(ST_GeomFromText(%s,%s),%s),geom)
-                            ),
-                            EXISTS (
-                                SELECT 1
-                                FROM apm.trees
+                                FROM {table}
                                 WHERE ST_Equals(geom, st_snaptogrid(ST_GeomFromText(%s,%s),%s))
                                 and id != %s
                             );
                         """
-                valuelist = [geom,EPSG_CODE,SNAPTOGRIDDEC,geom,EPSG_CODE,SNAPTOGRIDDEC,id]
+                valuelist = [geom,
+                             EPSG_CODE,
+                             SNAPTOGRIDDEC,
+                             id]
             else:
-                cons = """
+                cons = f"""
                         SELECT
                             EXISTS (
                                 SELECT 1
-                                FROM apm.parks
-                                WHERE ST_Within(st_snaptogrid(ST_GeomFromText(%s,%s),%s),geom)
-                            ),
-                            EXISTS (
-                                SELECT 1
-                                FROM apm.trees
+                                FROM {table}
                                 WHERE ST_Equals(geom, st_snaptogrid(ST_GeomFromText(%s,%s),%s))
                             );
                         """
-                valuelist = [geom,EPSG_CODE,SNAPTOGRIDDEC,geom,EPSG_CODE,SNAPTOGRIDDEC]
+                valuelist = [geom,EPSG_CODE,SNAPTOGRIDDEC]
             try:
                 self.cur.execute(cons,valuelist)
-                inside, exists = self.cur.fetchone()
+                exists = self.cur.fetchone()[0]
             except Exception as e:
                 print(f"Error: {e}")
                 self.disconnect()
                 sys.exit()
-            if not inside:
-                print("Error: The point is outside all polygon layers")
-                self.disconnect()
-                sys.exit()
+
             if exists and command!='update':
                 print("Error: The point with that geometry already exists")
                 self.disconnect()
                 sys.exit()
             else:
-                print("The new point falls inside an existing polygon in one of the layers")
-                
+                print("The new geometry does not intersect any existing geometry")
+
+    def point_in_polygon(self,geom,polygon_table):
+        cons = f"""
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM {POSTGRES_SQUEMA+'.'+polygon_table}
+                    WHERE ST_Within(st_snaptogrid(ST_GeomFromText(%s,%s),%s),geom)
+                );
+                """
+        try:
+            self.cur.execute(cons,[geom,EPSG_CODE,SNAPTOGRIDDEC])
+            inside = self.cur.fetchone()[0]
+        except Exception as e:
+            print(f"Error: {e}")
+            self.disconnect()
+            sys.exit()
+
+        if not inside:
+            print("Error: The point is outside all polygon layers")
+            self.disconnect()
+            sys.exit()
+
+        print("The point falls inside a polygon layer")
+
+    #Information Methods
+    def get_tables_by_geom(self, geom_type):
+        cons = f"""
+                SELECT f_table_name
+                FROM geometry_columns
+                WHERE f_table_schema = '{POSTGRES_SQUEMA}'
+                AND type = %s
+                """
+        try:
+            self.cur.execute(cons, [geom_type])
+            tables = [r[0] for r in self.cur.fetchall()]
+            return tables
+        except Exception as e:
+            print(f"Error: {e}")
+            self.disconnect()
+            sys.exit()

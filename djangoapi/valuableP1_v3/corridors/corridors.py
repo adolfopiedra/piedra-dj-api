@@ -9,106 +9,21 @@ from myLib.database import Database as Db
 class Corridors(Db):
     def __init__(self):
         super().__init__()
+        self.table = 'apm.corridors'
+        self.fields = 'id,description,dist,type,width,lighting,st_astext(geom)'
 
     def insert(self,dict):
         Db.is_valid(self,dict['geom'])
-        Db.check_intersection(self,dict['geom'])
-        Db.insert(self,'apm.corridors',dict)
-
-        # cons="""
-        # INSERT INTO apm.corridors 
-        #     (description,dist,type,width,lighting,geom)
-        # VALUES
-        #     (%s,%s,%s,%s,%s,
-        #     st_snaptogrid(st_geometryFromText(%s,%s),%s))
-        # RETURNING id
-        # """
-        # try:
-        #     self.cur.execute(cons,
-        #                 [dict['description'],
-        #                 dict['dist'],
-        #                 dict['type'],
-        #                 dict['width'],
-        #                 dict['lighting'],
-        #                 dict['geom'],
-        #                 EPSG_CODE,
-        #                 SNAPTOGRIDDEC
-        #                 ])
-        #     self.conn.commit()
-        #     l=self.cur.fetchall()
-        #     self.disconnect()
-
-        #     print('Inserted')
-        #     print([{"id":l[0][0]}])
-        #     return {
-        #     "ok": True,
-        #     "message": "Data inserted",
-        #     "data": [{"id":l[0][0]}]}
-        # except Exception as e:
-        #     print(f'Error: {e}')
-        #     self.conn.rollback()
-        #     self.disconnect()
-        #     return {
-        #         "ok": False,
-        #         "message": str(e),
-        #         "data": None
-        #         }
+        Db.check_intersection(self,dict['geom'],self.table)
+        Db.insert(self,self.table,dict)
 
     def update(self, dict):
         Db.is_valid(self,dict['geom'])
-        Db.check_intersection(self,dict['geom'],dict['id'],command='update')
-        cons="""
-            UPDATE
-                apm.corridors 
-            SET 
-                (description,dist,type,width,lighting,geom) = ROW(%s,%s,%s,%s,%s, st_geometryFromText(%s,%s))    
-            WHERE
-                id=%s
-            """
-        # As there are 5 %s, you need a list with 5 values: 
-        #   [description, area, the_geom_wkt, the_epsg_code, 
-        #           the_id_to_select_the_row]
-        valuesList=[dict['description'],
-                        dict['dist'],
-                        dict['type'],
-                        dict['width'],
-                        dict['lighting'],
-                        dict['geom'],
-                        EPSG_CODE,
-                        dict['id']
-                        ]
-        try:
-            self.cur.execute(cons, valuesList)
-            affected_rows = self.cur.rowcount
-            self.conn.commit()
-            self.disconnect()
-
-            if affected_rows > 0:
-                print([{f'rows_updated:{affected_rows}'}])
-                return {
-                    "ok": True,
-                    "message": "Data updated",
-                    "data": [{f'rows_updated:{affected_rows}'}]
-                }
-            else:
-                return {
-                    "ok": False,
-                    "message": "No row found with that id",
-                    "data": None
-                }
-        except Exception as e:
-            self.conn.rollback()
-            self.disconnect()
-
-            return {
-                "ok": False,
-                "message": str(e),
-                "data": None
-            }
+        Db.check_intersection(self,dict['geom'],self.table,dict['id'],command='update')
+        Db.update(self,self.table,dict)
 
     def select(self, dict, asDict=False):
-        fields = 'id,description,dist,type,width,lighting,st_astext(geom)'
-        Db.select(self,'apm.corridors',fields,dict['id'],asDict)
+        Db.select(self,self.table,self.fields,dict['id'],asDict)
     
     def delete(self,dict):
-        Db.delete(self,table='apm.corridors',id=dict['id'])
+        Db.delete(self,table=self.table,id=dict['id'])
