@@ -11,6 +11,8 @@ You can pass parameters to the scritp in the following way:+
 
     python manage.py runscript --script-args jaime martin 10 20
 
+    python manage.py runscript 001_hello_script --script-args jaime martin 10 20
+
 All parameters are received in string format
 
 """

@@ -1,14 +1,14 @@
 from django.contrib.gis.geos import GEOSGeometry
 from infraverde.models import Parks
 from valuableP1_v3.myLib import p1Settings
-# deactivate in windows. You don have GEOS
-#create the geometry with geos
+from valuableP1_v3.myLib.p1Settings import EPSG_CODE
+
 def run():
-    g=GEOSGeometry('POLYGON((0 0, 10 0, 10 10, 0 11, 0 0))', srid=p1Settings.EPSG_CODE)
+    g=GEOSGeometry('POLYGON((0 0, 10 0, 10 10, 0 11, 0 0))', srid=EPSG_CODE)
     if g.valid:
         print('Geometria Valida')
     #print the representation of the object
-    print(g)
+    #print(g)
     #create a building object, from the model Buildings
     #b=Buildings(description='Edificio 1', area=100, geom=g)
     b=Parks(description='Park 01 con Django', area=g.area, perimeter=g.length,geom=g,height=100 )
@@ -25,3 +25,4 @@ def run():
 
     #python manage.py runscript 001_hello_script --script-args p1 p2 p3
     #python manage.py runscript scripts.p1_django.djangomodels.insertDj
+    #python manage.py runscript script_without_extension --scriptargs param1 param2
