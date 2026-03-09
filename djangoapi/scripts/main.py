@@ -5,6 +5,9 @@ from scripts.p1_django.crud.parks_crud import Parks_crud
 # from scripts.p1_django.crud.trees_crud import Trees_crud
 # from scripts.p1_django.crud.corridors_crud import Corridors_crud
 
+#python manage.py runscript main --script-args parks selectAsDict
+#python manage.py runscript main --script-args parks selectAsTuple
+
 
 park_insert_dict ={
            'description':'My Second django park',
@@ -14,7 +17,7 @@ park_insert_dict ={
            'equipment':True,
            'geom':'POLYGON ((728610.8752566403709352 4373481.97025651764124632, 728645.17159836390055716 4373470.94643239211291075, 728633.97279290307778865 4373438.22492268681526184, 728600.5513578561367467 4373449.42372814752161503, 728610.8752566403709352 4373481.97025651764124632))'
 }
-# park_select_dict = {'id':10}
+park_select_dict = {'id':5}
 # park_update_dict = {
 #            'id':31,
 #            'description':'My first dict park update',
@@ -88,10 +91,10 @@ def run(*args):
         b=Parks_crud()
         if functionName=="insert":
             b.insert(park_insert_dict)
-    #     elif functionName=="selectAsTuple":
-    #         b.select(park_select_dict)
-    #     elif functionName=="selectAsDict":
-    #         b.select(park_select_dict,asDict=True)
+        elif functionName=="selectAsTuple":
+            b.select(park_select_dict)
+        elif functionName=="selectAsDict":
+            b.select(park_select_dict,asDict=True)
     #     elif functionName=="update":
     #         b.update(park_update_dict)
     #     elif functionName=="delete":
