@@ -268,6 +268,7 @@ class DbPsycopg():
                             )
                         ) and id != %s
                         """
+                #Revisar si es st_crosses
                 valuelist = [geom,
                             p1Settings.EPSG_CODE,
                             p1Settings.SNAPTOGRIDDEC,
