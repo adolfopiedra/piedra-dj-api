@@ -86,13 +86,24 @@ class DbDjango():
             print('Valid Geometry')
 
             #Check intersections with another geometry in the same layer:
-            intersections = self.st_relate(table,snapped_wkb_geometry,'T********')
-            if len(intersections) > 0:
-                d = {'ok': False, 
-                    'message':'The geometry interior intersects with the following geometries id',
-                    'data': intersections}
-                print(d)
-                return d
+            if g.geom_type in ['Polygon','LineString']:
+                intersections = self.st_relate(table,snapped_wkb_geometry,'T********')
+                if len(intersections) > 0:
+                    d = {'ok': False, 
+                        'message':'The geometry interior intersects with the following geometries id',
+                        'data': intersections}
+                    print(d)
+                    return d
+            elif g.geom_type in ['Point']:
+                inside = self.point_in_polygon(snapped_wkb_geometry)
+                if inside > 0:
+                    d = {'ok': False, 
+                        'message':'Error: The point is outside all polygon layers',
+                        'data': None}
+                    print(d)
+                    return d
+
+            
             
             #Insert the data
             if g.geom_type == 'Polygon':
@@ -204,7 +215,7 @@ class DbDjango():
         query="select st_snaptogrid(st_geomfromtext(%s, %s),%s)"
         self.cur.execute(query, [geom,EPSG_CODE, SNAPTOGRIDDEC])
         snapped_wkb_geometry=self.cur.fetchall()[0][0]
-        print(f'snapped_wkb_geometry: {snapped_wkb_geometry}')
+        #print(f'snapped_wkb_geometry: {snapped_wkb_geometry}')
         return snapped_wkb_geometry
     
     def st_relate(self,table,geom,matrix):
@@ -217,3 +228,15 @@ class DbDjango():
         self.cur.execute(query,[geom])
         return self.cur.fetchall()
         
+    def point_in_polygon(self,g):
+        #snapped_wkb_geometry = self.geomToSnappedWkb(geom)
+        #Create GEOS Geometry Object
+        #g = GEOSGeometry(g, srid=EPSG_CODE)
+        query="""
+                    SELECT id
+                    FROM infraverde_parks
+                    WHERE ST_Within(%s,geom)
+                ;
+                """
+        self.cur.execute(query,[g])
+        return self.cur.fetchone()[0]

@@ -6,7 +6,9 @@ from infraverde.models import Trees
 from django.http import JsonResponse
 
 
-class Trees_crud:
+class Trees_crud(dbdj):
+    def __init__(self):
+        super().__init__()
     def insert(self,dict):
         return dbdj.insert(self,Trees,dict,'infraverde_trees')
         # try:
