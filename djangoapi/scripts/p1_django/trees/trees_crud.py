@@ -8,37 +8,38 @@ from django.http import JsonResponse
 
 class Trees_crud:
     def insert(self,dict):
-        try:
-            g = GEOSGeometry(dict['geom'], srid=EPSG_CODE)
-            if not g.valid:
-                d={'ok': False,
-                'message': g.valid_reason,
-                'data':None}
-                print(d)
-                return d
-            print('Valid Geometry')
+        return dbdj.insert(self,Trees,dict,'infraverde_trees')
+        # try:
+        #     g = GEOSGeometry(dict['geom'], srid=EPSG_CODE)
+        #     if not g.valid:
+        #         d={'ok': False,
+        #         'message': g.valid_reason,
+        #         'data':None}
+        #         print(d)
+        #         return d
+        #     print('Valid Geometry')
 
-            b = Trees(description=dict["description"],
-                    species=dict["species"],
-                    height=dict["height"],
-                    condition=dict["condition"],
-                    is_protected=dict["is_protected"],
-                    geom=g)
+        #     b = Trees(description=dict["description"],
+        #             species=dict["species"],
+        #             height=dict["height"],
+        #             condition=dict["condition"],
+        #             is_protected=dict["is_protected"],
+        #             geom=g)
 
-            b.save()
+        #     b.save()
 
-            d = {"ok": True,
-                "message": "Data inserted",
-                "data": [{"id": b.id}]}
+        #     d = {"ok": True,
+        #         "message": "Data inserted",
+        #         "data": [{"id": b.id}]}
 
-            print(d)
-            return d
-        except Exception as e:
-                d = {"ok": False,
-                    "message": str(e),
-                    "data": None}
-                print(d)
-                return d
+        #     print(d)
+        #     return d
+        # except Exception as e:
+        #         d = {"ok": False,
+        #             "message": str(e),
+        #             "data": None}
+        #         print(d)
+        #         return d
         
     def update(self,dict):
         try:

@@ -5,39 +5,43 @@ from scripts.myLib.dbdj import DbDjango as dbdj
 from infraverde.models import Corridors
 from django.http import JsonResponse
 
-class Corridors_crud:
+class Corridors_crud(dbdj):
+    def __init__(self):
+        super().__init__()
+
     def insert(self,dict):
-        try:
-            g = GEOSGeometry(dict['geom'], srid=EPSG_CODE)
-            if not g.valid:
-                d={'ok': False,
-                'message': g.valid_reason,
-                'data':None}
-                print(d)
-                return d
-            print('Valid Geometry')
+        return dbdj.insert(self,Corridors,dict,'infraverde_corridors')
+        # try:
+        #     g = GEOSGeometry(dict['geom'], srid=EPSG_CODE)
+        #     if not g.valid:
+        #         d={'ok': False,
+        #         'message': g.valid_reason,
+        #         'data':None}
+        #         print(d)
+        #         return d
+        #     print('Valid Geometry')
 
-            b = Corridors(description=dict["description"],
-                        dist=g.length,
-                        type=dict["type"],
-                        width=dict["width"],
-                        lighting=dict["lighting"],
-                        geom=g)
+        #     b = Corridors(description=dict["description"],
+        #                 dist=g.length,
+        #                 type=dict["type"],
+        #                 width=dict["width"],
+        #                 lighting=dict["lighting"],
+        #                 geom=g)
 
-            b.save()
+        #     b.save()
 
-            d = {"ok": True,
-                "message": "Data inserted",
-                "data": [{"id": b.id}]}
+        #     d = {"ok": True,
+        #         "message": "Data inserted",
+        #         "data": [{"id": b.id}]}
 
-            print(d)
-            return d
-        except Exception as e:
-                d = {"ok": False,
-                    "message": str(e),
-                    "data": None}
-                print(d)
-                return d
+        #     print(d)
+        #     return d
+        # except Exception as e:
+        #         d = {"ok": False,
+        #             "message": str(e),
+        #             "data": None}
+        #         print(d)
+        #         return d
         
     def update(self,dict):
         try:

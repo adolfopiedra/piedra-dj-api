@@ -8,22 +8,22 @@ from scripts.myLib.p1Settings import EPSG_CODE, SNAPTOGRIDDEC
 
 
 class DbDjango():
+    def __init__(self):
+        self.cur=connection.cursor()
+
     def select(self,model,dict,asDict):
         try:
-            if asDict:
-                b = model.objects.filter(id=dict['id']).first()
-            else:
-                b = model.objects.filter(id=dict['id']).values_list().first()
-
+            b = model.objects.filter(id=dict['id']).first() #id__gt = gmayor que
             if b:
-                if asDict:
-                    data = [model_to_dict(b)]
-                else:
-                    data = [b]
+                data = model_to_dict(b)
+                data['geom']=b.geom.wkt
+                data['data_creation']=data['data_creation'].strftime("%Y-%m-%d %H:%M:%S")
+                if not asDict:
+                    data = tuple(data.values())
 
                 d = {"ok": True,
                     "message": "Data retrieved",
-                    "data": data}
+                    "data": [data]}
             else:
                 d = {"ok":False,
                     "message":"No row found with that id",
@@ -70,16 +70,13 @@ class DbDjango():
 
     def insert(self,model,dict,table):
         try:
-            #we first get the snapped wkb format for the geometry:
-            cur=connection.cursor()
-            query="select st_snaptogrid(st_geomfromtext(%s, %s),%s)"
-            cur.execute(query, [dict['geom'],EPSG_CODE, SNAPTOGRIDDEC])
-            snapped_wkb_geometry=cur.fetchall()[0][0]
-            print(f'snapped_wkb_geometry: {snapped_wkb_geometry}')
+            #Get the snapped wkb format for the geometry:
+            snapped_wkb_geometry = self.geomToSnappedWkb(dict['geom'])
 
-            #now we can check if it is valid as before:
+            #Create GEOS Geometry Object
             g = GEOSGeometry(snapped_wkb_geometry, srid=EPSG_CODE)
-            
+
+            #Check if GEOS Geometry is valid:
             if not g.valid:
                 d={'ok': False,
                 'message': g.valid_reason,
@@ -88,21 +85,12 @@ class DbDjango():
                 return d
             print('Valid Geometry')
 
-            #Now we can check if it intersects with another geomtry in the same layer
-            #check if the geometry intersects any existing geometry
-            query=f""" 
-                    select id from {table} where ST_relate(
-                        geom,
-                        %s,
-                        'T********')
-                """
-            cur.execute(query, [snapped_wkb_geometry])
-            r=cur.fetchall()
-
-            if len(r)>0:
+            #Check intersections with another geometry in the same layer:
+            intersections = self.st_relate(table,snapped_wkb_geometry,'T********')
+            if len(intersections) > 0:
                 d = {'ok': False, 
                     'message':'The geometry interior intersects with the following geometries id',
-                    'data': r}
+                    'data': intersections}
                 print(d)
                 return d
             
@@ -117,7 +105,7 @@ class DbDjango():
 
             data=model_to_dict(p)
             data['geom']=g.wkt
-            #data['data_creation']=data['data_creation'].strftime("%Y-%m-%d %H:%M:%S")
+            data['data_creation']=data['data_creation'].strftime("%Y-%m-%d %H:%M:%S")
 
             d = {"ok": True,
                 "message": "Data inserted",
@@ -206,3 +194,26 @@ class DbDjango():
                 print(d)
                 return d
 
+
+
+
+
+    #Geometry and Topology Tools
+    def geomToSnappedWkb(self,geom):
+        '''WKT to Snapped WKB'''
+        query="select st_snaptogrid(st_geomfromtext(%s, %s),%s)"
+        self.cur.execute(query, [geom,EPSG_CODE, SNAPTOGRIDDEC])
+        snapped_wkb_geometry=self.cur.fetchall()[0][0]
+        print(f'snapped_wkb_geometry: {snapped_wkb_geometry}')
+        return snapped_wkb_geometry
+    
+    def st_relate(self,table,geom,matrix):
+        query=f""" 
+                select id from {table} where ST_relate(
+                    geom,
+                    %s,
+                    '{matrix}')
+                """
+        self.cur.execute(query,[geom])
+        return self.cur.fetchall()
+        
