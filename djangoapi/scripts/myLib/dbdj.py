@@ -88,23 +88,22 @@ class DbDjango():
             #Check intersections with another geometry in the same layer:
             if g.geom_type in ['Polygon','LineString']:
                 intersections = self.st_relate(table,snapped_wkb_geometry,'T********')
-                if len(intersections) > 0:
-                    d = {'ok': False, 
-                        'message':'The geometry interior intersects with the following geometries id',
-                        'data': intersections}
-                    print(d)
-                    return d
+
             elif g.geom_type in ['Point']:
                 inside = self.point_in_polygon(snapped_wkb_geometry)
-                if inside > 0:
+                if not inside:
                     d = {'ok': False, 
                         'message':'Error: The point is outside all polygon layers',
                         'data': None}
                     print(d)
                     return d
-
-            
-            
+                intersections = self.st_relate(table,snapped_wkb_geometry,'T********')
+            if intersections:
+                d = {'ok': False, 
+                    'message':'The geometry interior intersects with the following geometries id',
+                    'data': intersections}
+                print(d)
+                return d
             #Insert the data
             if g.geom_type == 'Polygon':
                 dict['area']=g.area
@@ -121,7 +120,6 @@ class DbDjango():
             d = {"ok": True,
                 "message": "Data inserted",
                 "data": [data]}
-
             print(d)
             return d
         except Exception as e:
@@ -133,16 +131,13 @@ class DbDjango():
     
     def update(self,model,dict,table):
         try:
-            #we first get the snapped wkb format for the geometry:
-            cur=connection.cursor()
-            query="select st_snaptogrid(st_geomfromtext(%s, %s),%s)"
-            cur.execute(query, [dict['geom'],EPSG_CODE, SNAPTOGRIDDEC])
-            snapped_wkb_geometry=cur.fetchall()[0][0]
-            print(f'snapped_wkb_geometry: {snapped_wkb_geometry}')
+            #Get the snapped wkb format for the geometry:
+            snapped_wkb_geometry = self.geomToSnappedWkb(dict['geom'])
             
-            
-            #now we can check if it is valid as before:
+            #Create GEOS Geometry Object
             g = GEOSGeometry(snapped_wkb_geometry, srid=EPSG_CODE)
+
+            #Check if GEOS Geometry is valid:
             if not g.valid:
                 d={'ok': False,
                 'message': g.valid_reason,
@@ -151,44 +146,34 @@ class DbDjango():
                 return d
             print('Valid Geometry')
             
-            #Now we can check if it intersects with another geomtry in the same layer
-            #check if the geometry intersects any existing geometry
-            query=f""" 
-                    select id from {table} where ST_relate(
-                        geom,
-                        %s,
-                        'T********') and id != %s
-                """
-            cur.execute(query, [snapped_wkb_geometry, dict['id']])
-            r=cur.fetchall()
-
-            if len(r)>0:
-                d = {'ok': False, 
-                    'message':'The geometry interior intersects with the following geometries id',
-                    'data': r}
-                print(d)
-                return d
-
-            #Recalc area or dist
+            #Check intersections with another geometry in the same layer:
+            if g.geom_type in ['Polygon','LineString']:
+                intersections = self.st_relate(table,snapped_wkb_geometry,'T********',dict['id'], update=True)
+                
+            elif g.geom_type in ['Point']:
+                inside = self.point_in_polygon(snapped_wkb_geometry)
+                if not inside:
+                    d = {'ok': False, 
+                        'message':'Error: The point is outside all polygon layers',
+                        'data': None}
+                    print(d)
+                    return d
+                intersections = self.st_relate(table,snapped_wkb_geometry,'T********',dict['id'], update=True)
+            if intersections:
+                    d = {'ok': False, 
+                        'message':'The geometry interior intersects with the following geometries id',
+                        'data': intersections}
+                    print(d)
+                    return d
+            #Recalc area, dist and data creation
             if g.geom_type == 'Polygon':
                 dict['area']=g.area
             elif g.geom_type == 'LineString':
                 dict['dist']=g.length
-            elif g.geom_type == 'Point':
-                pass
             dict['geom']=g 
-
-            p = model.objects.filter(id=dict['id']).first().update(**dict)
-
+            #Execute Update
+            p = model.objects.filter(id=dict['id']).update(**dict)
             if p:
-                p.area = g.area
-                p.description = dict['description']
-                p.type = dict['type']
-                p.management = dict['management']
-                p.equipment = dict['equipment']
-                p.geom = g
-                p.save()
-
                 d = {"ok": True,
                     "message": "Data updated",
                     "data": [{"rows_updated": 1}]}
@@ -206,9 +191,6 @@ class DbDjango():
                 return d
 
 
-
-
-
     #Geometry and Topology Tools
     def geomToSnappedWkb(self,geom):
         '''WKT to Snapped WKB'''
@@ -218,20 +200,27 @@ class DbDjango():
         #print(f'snapped_wkb_geometry: {snapped_wkb_geometry}')
         return snapped_wkb_geometry
     
-    def st_relate(self,table,geom,matrix):
-        query=f""" 
-                select id from {table} where ST_relate(
-                    geom,
-                    %s,
-                    '{matrix}')
+    def st_relate(self,table,geom,matrix,id=None,update=False):
+        if update:
+            query=f""" 
+                    select id from {table} where ST_relate(
+                        geom,
+                        %s,
+                        'T********') and id != %s
                 """
-        self.cur.execute(query,[geom])
-        return self.cur.fetchall()
+            self.cur.execute(query,[geom,id])
+        else:
+            query=f""" 
+                    select id from {table} where ST_relate(
+                        geom,
+                        %s,
+                        '{matrix}')
+                    """
+            self.cur.execute(query,[geom])
+        relate = self.cur.fetchall()
+        return relate
         
     def point_in_polygon(self,g):
-        #snapped_wkb_geometry = self.geomToSnappedWkb(geom)
-        #Create GEOS Geometry Object
-        #g = GEOSGeometry(g, srid=EPSG_CODE)
         query="""
                     SELECT id
                     FROM infraverde_parks
@@ -239,4 +228,7 @@ class DbDjango():
                 ;
                 """
         self.cur.execute(query,[g])
-        return self.cur.fetchone()[0]
+        return self.cur.fetchall()
+        
+        
+         

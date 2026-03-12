@@ -14,13 +14,12 @@ park_insert_dict ={
            'type':'Urban',
            'management':'Local',
            'equipment':True,
-           'geom':'POLYGON ((728610.8752566403709352 4373481.97025651764124632, 728645.17159836390055716 4373470.94643239211291075, 728633.97279290307778865 4373438.22492268681526184, 728600.5513578561367467 4373449.42372814752161503, 728610.8752566403709352 4373481.97025651764124632))'
+           'geom':'POLYGON ((728676.40576671902090311 4373547.23829459585249424, 728687.07962817384395748 4373578.25373628176748753, 728694.21011758828535676 4373575.97897892259061337, 728683.31752946437336504 4373544.78855590149760246, 728676.40576671902090311 4373547.23829459585249424))'
 }
-park_select_dict = {'id':29}
+park_select_dict = {'id':3}
 park_update_dict = {
-           'id':27,
+           'id':3,
            'description':'My first park update django',
-           'area':3000,
            'type':'Historic',
            'management':'Municipal',
            'equipment':False,
@@ -34,17 +33,17 @@ tree_insert_dict ={
            'height':9.5,
            'condition':'Regular',
            'is_protected':False,
-           'geom':'POINT (728621.72409943037200719 4373459.57264559622853994)'
+           'geom':'POINT (728688.3482428549323231 4373571.5169548699632287)'
 }
 tree_select_dict = {'id':1}
 tree_update_dict ={
-           'id':1,
+           'id':13,
            'description':'My first update with db class',
            'species':'Lemon',
            'height':17.2,
            'condition':'Good',
            'is_protected':True,
-           'geom':'POINT (728722.73207524628378451 4373551.08788396790623665)'
+           'geom':'POINT (728683.44876546587329358 4373557.60593871213495731)'
 }
 tree_delete_dict = {'id':2}
 
@@ -55,17 +54,16 @@ corr_insert_dict ={
            'lighting':True,
            'geom':'LINESTRING (728913.98667475546244532 4373514.86674755252897739, 728893.68883985781576484 4373522.74090764205902815, 728891.41408249863889068 4373519.06629960052669048, 728860.09242347558028996 4373529.91514238994568586)'
 }
-corr_select_dict = {'id':1}
+corr_select_dict = {'id':2}
 corr_update_dict ={
            'description':'Puente',
-           'dist':17.25,
            'type':'pedestrian',
            'width':1,
            'lighting':True,
            'geom':'LINESTRING (728773.91411582741420716 4373270.24284076597541571, 727896.20773784175980836 4373567.71111082006245852)',
-           'id':1
+           'id':4
 }
-corr_delete_dict = {'id':2}
+corr_delete_dict = {'id':4}
 
 def run(*args):
     #print(args)
