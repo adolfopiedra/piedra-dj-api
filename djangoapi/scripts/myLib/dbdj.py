@@ -1,3 +1,5 @@
+#https://urianviera.com/django/metodos-comunes-en-django
+
 from django.forms.models import model_to_dict
 from django.db import connection
 from django.contrib.gis.geos import GEOSGeometry
