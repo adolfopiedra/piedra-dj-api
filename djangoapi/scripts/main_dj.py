@@ -6,11 +6,11 @@ from scripts.p1_django.corridors.corridors_crud import Corridors_crud
 
 #python manage.py runscript main_dj --script-args parks selectAsDict
 #python manage.py runscript main_dj --script-args parks selectAsTuple
+#python manage.py runscript main_dj --script-args parks insert
 
 
 park_insert_dict ={
            'description':'My Second django park',
-           'area':0, #Se calcula
            'type':'Urban',
            'management':'Local',
            'equipment':True,
@@ -18,7 +18,7 @@ park_insert_dict ={
 }
 park_select_dict = {'id':5}
 park_update_dict = {
-           'id':1,
+           'id':27,
            'description':'My first park update django',
            'area':3000,
            'type':'Historic',
@@ -50,7 +50,6 @@ tree_delete_dict = {'id':2}
 
 corr_insert_dict ={
            'description':'Av.Naranjos',
-           'dist':20,
            'type':'peatonal',
            'width':1,
            'lighting':True,
