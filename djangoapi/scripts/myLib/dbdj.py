@@ -28,13 +28,11 @@ class DbDjango():
                 d = {"ok":False,
                     "message":"No row found with that id",
                     "data":None}
-            print(d)
             return d
         except Exception as e:
                 d = {"ok": False,
                     "message": str(e),
                     "data": None}
-                print(d)
                 return d
     
     def selectallAsDicts(self,model):
@@ -44,7 +42,6 @@ class DbDjango():
             dict=model_to_dict(b)
             data.append(dict)
         d = {'ok':True, 'message': 'Data retrieved', 'data': data}
-        print(d)
         return d
 
     def delete(self,model,dict):
@@ -59,13 +56,11 @@ class DbDjango():
                 d = {"ok":False,
                     "message":"No row found with that id",
                     "data":None}
-            print(d)
             return d
         except Exception as e:
             d = {"ok": False,
                 "message": str(e),
                 "data": None}
-            print(d)
             return d   
 
     def insert(self,model,dict,table):
@@ -95,14 +90,12 @@ class DbDjango():
                     d = {'ok': False, 
                         'message':'Error: The point is outside all polygon layers',
                         'data': None}
-                    print(d)
                     return d
                 intersections = self.st_relate(table,snapped_wkb_geometry,'T********')
             if intersections:
                 d = {'ok': False, 
                     'message':'The geometry interior intersects with the following geometries id',
                     'data': intersections}
-                print(d)
                 return d
             #Insert the data
             if g.geom_type == 'Polygon':
@@ -120,13 +113,11 @@ class DbDjango():
             d = {"ok": True,
                 "message": "Data inserted",
                 "data": [data]}
-            print(d)
             return d
         except Exception as e:
             d = {"ok": False,
                 "message": str(e),
                 "data": None}
-            print(d)
             return d
     
     def update(self,model,dict,table):
@@ -142,7 +133,6 @@ class DbDjango():
                 d={'ok': False,
                 'message': g.valid_reason,
                 'data':None}
-                print(d)
                 return d
             print('Valid Geometry')
             
@@ -156,14 +146,12 @@ class DbDjango():
                     d = {'ok': False, 
                         'message':'Error: The point is outside all polygon layers',
                         'data': None}
-                    print(d)
                     return d
                 intersections = self.st_relate(table,snapped_wkb_geometry,'T********',dict['id'], update=True)
             if intersections:
                     d = {'ok': False, 
                         'message':'The geometry interior intersects with the following geometries id',
                         'data': intersections}
-                    print(d)
                     return d
             #Recalc area, dist and data creation
             if g.geom_type == 'Polygon':
@@ -181,15 +169,12 @@ class DbDjango():
                 d = {"ok":False,
                     "message":"No row found with that id",
                     "data":None}
-            print(d)
             return d
         except Exception as e:
                 d = {"ok": False,
                     "message": str(e),
                     "data": None}
-                print(d)
                 return d
-
 
     #Geometry and Topology Tools
     def geomToSnappedWkb(self,geom):

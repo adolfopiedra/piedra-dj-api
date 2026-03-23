@@ -20,7 +20,7 @@ class Trees(models.Model):
     condition = models.CharField(max_length=100,blank=True,null=True)
     is_protected = models.BooleanField(blank=True,null=True)
     geom = gis_models.PointField(srid=25830,blank=True,null=True)
-    data_creation = models.DateTimeField(blank = True, db_default=djangoTimezone.now(),auto_now_add=True)
+    data_creation = models.DateTimeField(blank = True, db_default=djangoTimezone.now())
 
 class Corridors(models.Model):
     id = models.AutoField(primary_key=True)

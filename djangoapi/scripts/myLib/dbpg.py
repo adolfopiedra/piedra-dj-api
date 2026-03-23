@@ -42,7 +42,6 @@ class DbPsycopg():
                 ({val_string})
                 RETURNING id
             """
-
             values = [dict[c] for c in cols] + [dict['geom'], EPSG_CODE, SNAPTOGRIDDEC]
 
             self.cur.execute(cons, values)

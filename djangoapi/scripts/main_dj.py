@@ -7,63 +7,66 @@ from scripts.p1_django.corridors.corridors_crud import Corridors_crud
 #python manage.py runscript main_dj --script-args parks selectAsDict
 #python manage.py runscript main_dj --script-args parks selectAsTuple
 #python manage.py runscript main_dj --script-args parks insert
-
-
-park_insert_dict ={
-           'description':'My Second django park',
-           'type':'Urban',
-           'management':'Local',
-           'equipment':True,
-           'geom':'POLYGON ((728676.40576671902090311 4373547.23829459585249424, 728687.07962817384395748 4373578.25373628176748753, 728694.21011758828535676 4373575.97897892259061337, 728683.31752946437336504 4373544.78855590149760246, 728676.40576671902090311 4373547.23829459585249424))'
-}
-park_select_dict = {'id':3}
+park_insert_dict = {
+        'description':'My first park',
+        'area':1500,
+        'type':'Historic',
+        'management':'Municipal',
+        'equipment':True,
+        'geom':'POLYGON ((728819.67173501581419259 4373398.11045156698673964, 728845.91893531451933086 4373477.20201513357460499, 729006.90176381275523454 4373421.20798782911151648, 728975.40512345440220088 4373323.5684027187526226, 728884.76479175640270114 4373363.46414717193692923, 728819.67173501581419259 4373398.11045156698673964))'}
+        #'geom': 'POLYGON ((728855.98036209610290825 4373352.87777639459818602, 728877.67804767633788288 4373402.57247562613338232, 728916.17394144763238728 4373381.57471538707613945, 728898.67580791527871042 4373336.7794935442507267, 728855.98036209610290825 4373352.87777639459818602))'} #Interseca con el poligono anterior
+park_select_dict = {'id':6}
 park_update_dict = {
-           'id':3,
-           'description':'My first park update django',
+           'id':6,
+           'description':'My first park updated',
+           'area':3000,
            'type':'Historic',
            'management':'Municipal',
            'equipment':False,
-           'geom':'POLYGON ((728651.33969043404795229 4373712.07071246579289436, 728717.13267251593060791 4373691.07295222673565149, 728683.53625613369513303 4373597.98288183473050594, 728617.04334871040191501 4373618.28071673214435577, 728651.33969043404795229 4373712.07071246579289436))'
+           'geom':'POLYGON ((728819.67173501581419259 4373398.11045156698673964, 728845.91893531451933086 4373477.20201513357460499, 729006.90176381275523454 4373421.20798782911151648, 728975.40512345440220088 4373323.5684027187526226, 728884.76479175640270114 4373363.46414717193692923, 728819.67173501581419259 4373398.11045156698673964))'
 }
-park_delete_dict = {'id':2}
+park_delete_dict = {'id':6}
 
 tree_insert_dict ={
-           'description':'My first dict tree',
+           'description':'My first tree',
            'species':'Naranjo',
            'height':9.5,
            'condition':'Regular',
            'is_protected':False,
-           'geom':'POINT (728688.3482428549323231 4373571.5169548699632287)'
+           'geom':'POINT (728945.48331511404830962 4373427.59480656683444977)' #Punto dentro de poligono
+           #'geom':'POINT (729016.70071859075687826 4373409.5717290285974741)' #Punto fuera de poligono
 }
-tree_select_dict = {'id':1}
+tree_select_dict = {'id':22}
 tree_update_dict ={
-           'id':13,
-           'description':'My first update with db class',
+           'id':22,
+           'description':'My first updated tree',
            'species':'Lemon',
            'height':17.2,
            'condition':'Good',
            'is_protected':True,
-           'geom':'POINT (728683.44876546587329358 4373557.60593871213495731)'
+           'geom':'POINT (728945.48331511404830962 4373427.59480656683444977)'
 }
-tree_delete_dict = {'id':2}
+tree_delete_dict = {'id':22}
 
 corr_insert_dict ={
            'description':'Av.Naranjos',
+           'dist':567.5,
            'type':'peatonal',
            'width':1,
            'lighting':True,
-           'geom':'LINESTRING (728913.98667475546244532 4373514.86674755252897739, 728893.68883985781576484 4373522.74090764205902815, 728891.41408249863889068 4373519.06629960052669048, 728860.09242347558028996 4373529.91514238994568586)'
+           'geom':'LINESTRING (729311.19430594204459339 4373088.30599737819284201, 728773.56415315857157111 4373270.46156745310872793)'
 }
-corr_select_dict = {'id':2}
+corr_select_dict = {'id':6}
 corr_update_dict ={
-           'description':'Puente',
-           'type':'pedestrian',
-           'width':1,
+           'description':'Av.Naranjos',
+           'dist':567.5,
+           'type':'ciclovia',
+           'width':1.2,
            'lighting':True,
-           'geom':'LINESTRING (728773.91411582741420716 4373270.24284076597541571, 727896.20773784175980836 4373567.71111082006245852)',
-           'id':4
+           'geom':'LINESTRING (729311.19430594204459339 4373088.30599737819284201, 728773.56415315857157111 4373270.46156745310872793)',
+           'id':6
 }
-corr_delete_dict = {'id':4}
+corr_delete_dict = {'id':6}
 
 def run(*args):
     #print(args)
@@ -86,47 +89,47 @@ def run(*args):
     if tableName == "parks":
         b=Parks_crud()
         if functionName=="insert":
-            b.insert(park_insert_dict)
+            print(b.insert(park_insert_dict))
         elif functionName=="selectAsTuple":
-            b.select(park_select_dict)
+            print(b.select(park_select_dict))
         elif functionName=="selectAsDict":
-            b.select(park_select_dict,asDict=True)
+            print(b.select(park_select_dict,asDict=True))
         elif functionName=="selectallAsDicts":
-            b.selectallAsDicts()
+            print(b.selectallAsDicts())
         elif functionName=="update":
-            b.update(park_update_dict)
+            print(b.update(park_update_dict))
         elif functionName=="delete":
-            b.delete(park_delete_dict)
+            print(b.delete(park_delete_dict))
 
     elif tableName=="trees":
         b=Trees_crud()
         if functionName=="insert":
-            b.insert(tree_insert_dict)
+            print(b.insert(tree_insert_dict))
         elif functionName=="selectAsTuple":
-            b.select(tree_select_dict)
+            print(b.select(tree_select_dict))
         elif functionName=="selectAsDict":
-            b.select(tree_select_dict,asDict=True)
+            print(b.select(tree_select_dict,asDict=True))
         elif functionName=="selectallAsDicts":
-            b.selectallAsDicts()
+            print(b.selectallAsDicts())
         elif functionName=="update":
-            b.update(tree_update_dict)
+            print(b.update(tree_update_dict))
         elif functionName=="delete":
-            b.delete(tree_delete_dict)
+            print(b.delete(tree_delete_dict))
 
     elif tableName=="corridors":
         b=Corridors_crud()
         if functionName=="insert":
-            b.insert(corr_insert_dict)
+            print(b.insert(corr_insert_dict))
         elif functionName=="selectAsTuple":
-            b.select(corr_select_dict)
+            print(b.select(corr_select_dict))
         elif functionName=="selectAsDict":
-            b.select(corr_select_dict, asDict=True)
+            print(b.select(corr_select_dict, asDict=True))
         elif functionName=="selectallAsDicts":
-            b.selectallAsDicts()
+            print(b.selectallAsDicts())
         elif functionName=="update":
-            b.update(corr_update_dict)
+            print(b.update(corr_update_dict))
         elif functionName=="delete":
-            b.delete(corr_delete_dict)
+            print(b.delete(corr_delete_dict))
 
 if __name__ == "__main__":
     run()

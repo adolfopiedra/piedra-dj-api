@@ -3,68 +3,73 @@ from p1_psycopg.parks.parks import Parks
 from p1_psycopg.trees.trees import Trees
 from p1_psycopg.corridors.corridors import Corridors
 
-import dicts
-
-
 # para ejecutar
-#Directorio: 
 # python main_pg.py parks insert
 # python main_pg.py parks update
 # python main_pg.py parks selectAsDict
 # python main_pg.py parks selectAsTuple
 
-park_insert_dict = dicts.park_insert_3
-park_select_dict = {'id':10}
+park_insert_dict = {
+        'description':'My first park',
+        'area':1500,
+        'type':'Historic',
+        'management':'Municipal',
+        'equipment':True,
+        'geom':'POLYGON ((728819.67173501581419259 4373398.11045156698673964, 728845.91893531451933086 4373477.20201513357460499, 729006.90176381275523454 4373421.20798782911151648, 728975.40512345440220088 4373323.5684027187526226, 728884.76479175640270114 4373363.46414717193692923, 728819.67173501581419259 4373398.11045156698673964))'}
+        #'geom': 'POLYGON ((728855.98036209610290825 4373352.87777639459818602, 728877.67804767633788288 4373402.57247562613338232, 728916.17394144763238728 4373381.57471538707613945, 728898.67580791527871042 4373336.7794935442507267, 728855.98036209610290825 4373352.87777639459818602))'} #Interseca con el poligono anterior
+park_select_dict = {'id':40}
 park_update_dict = {
-           'id':31,
-           'description':'My first dict park update',
+           'id':40,
+           'description':'My first park updated',
            'area':3000,
            'type':'Historic',
            'management':'Municipal',
            'equipment':False,
-           'geom':'POLYGON ((728651.33969043404795229 4373712.07071246579289436, 728717.13267251593060791 4373691.07295222673565149, 728683.53625613369513303 4373597.98288183473050594, 728617.04334871040191501 4373618.28071673214435577, 728651.33969043404795229 4373712.07071246579289436))'
+           'geom':'POLYGON ((728819.67173501581419259 4373398.11045156698673964, 728845.91893531451933086 4373477.20201513357460499, 729006.90176381275523454 4373421.20798782911151648, 728975.40512345440220088 4373323.5684027187526226, 728884.76479175640270114 4373363.46414717193692923, 728819.67173501581419259 4373398.11045156698673964))'
 }
-park_delete_dict = {'id':7}
+park_delete_dict = {'id':40}
 
 tree_insert_dict ={
-           'description':'My first dict tree',
+           'description':'My first tree',
            'species':'Naranjo',
            'height':9.5,
            'condition':'Regular',
            'is_protected':False,
-           'geom':'POINT (728621.72409943037200719 4373459.57264559622853994)'
+           #'geom':'POINT (728945.48331511404830962 4373427.59480656683444977)' #Punto dentro de poligono
+           'geom':'POINT (729016.70071859075687826 4373409.5717290285974741)' #Punto fuera de poligono
 }
-tree_select_dict = {'id':26}
+
+tree_select_dict = {'id':27}
 tree_update_dict ={
-           'id':25,
-           'description':'My first update with db class',
+           'id':27,
+           'description':'My first updated tree',
            'species':'Lemon',
            'height':17.2,
            'condition':'Good',
            'is_protected':True,
-           'geom':'POINT (728722.73207524628378451 4373551.08788396790623665)'
+           'geom':'POINT (728945.48331511404830962 4373427.59480656683444977)'
 }
-tree_delete_dict = {'id':6}
+tree_delete_dict = {'id':27}
 
 corr_insert_dict ={
            'description':'Av.Naranjos',
-           'dist':20,
+           'dist':567.5,
            'type':'peatonal',
            'width':1,
            'lighting':True,
-           'geom':'LINESTRING (728913.98667475546244532 4373514.86674755252897739, 728893.68883985781576484 4373522.74090764205902815, 728891.41408249863889068 4373519.06629960052669048, 728860.09242347558028996 4373529.91514238994568586)'
+           'geom':'LINESTRING (729311.19430594204459339 4373088.30599737819284201, 728773.56415315857157111 4373270.46156745310872793)'
 }
-corr_select_dict = {'id':17}
+corr_select_dict = {'id':18}
 corr_update_dict ={
-           'description':'Puente',
-           'dist':17.25,
-           'type':'pedestrian',
-           'width':1,
+           'description':'Av.Naranjos',
+           'dist':567.5,
+           'type':'ciclovia',
+           'width':1.2,
            'lighting':True,
-           'geom':'LINESTRING (728773.91411582741420716 4373270.24284076597541571, 727896.20773784175980836 4373567.71111082006245852)',
-           'id':8
+           'geom':'LINESTRING (729311.19430594204459339 4373088.30599737819284201, 728773.56415315857157111 4373270.46156745310872793)',
+           'id':18
 }
-corr_delete_dict = {'id':6}
+corr_delete_dict = {'id':18}
 
 def main():
     # sys.argv[0] es siempre el nombre del archivo (main.py)
