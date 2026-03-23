@@ -51,7 +51,6 @@ class DbPsycopg():
             d = {"ok": True,
                 "message": "Data inserted",
                 "data": [{"id": new_id}]}
-            print(d)
             self.disconnect()
             return d
 
@@ -60,7 +59,6 @@ class DbPsycopg():
             d = {"ok": False,
                 "message": str(e),
                 "data": None}
-            print(d)
             self.disconnect()
             return d
 
@@ -84,14 +82,12 @@ class DbPsycopg():
                 d = {"ok": True,
                     "message": "Data updated",
                     "data": [{"rows_updated": affected_rows}]}
-                print(d)
                 self.disconnect()
                 return d
             else:
                 d = {"ok": False,
                     "message": "No row found with that id",
                     "data": None}
-                print(d)
                 self.disconnect()
                 return d
         except Exception as e:
@@ -99,7 +95,6 @@ class DbPsycopg():
             d = {"ok": False,
                 "message": str(e),
                 "data": None}
-            print(d)
             self.disconnect()
             return d        
 
@@ -123,14 +118,12 @@ class DbPsycopg():
                 d = {"ok": True,
                     "message": "Data retrieved",
                     "data": l}
-                print(d)
                 self.disconnect()
                 return d
             else:
                 d = {"ok": False,
                     "message": "No data found",
                     "data": None}
-                print(d)
                 self.disconnect()
                 return d
         except Exception as e:
@@ -138,7 +131,6 @@ class DbPsycopg():
             d = {"ok": False,
                 "message": str(e),
                 "data": None}
-            print(d)
             self.disconnect()
             return d
 
@@ -155,18 +147,15 @@ class DbPsycopg():
             self.conn.commit()
             
             if affected_rows > 0:
-                print(f"rows_deleted:{affected_rows}")
                 d = {"ok": True,
                     "message": "Data deleted",
                     "data": [{"rows_deleted": affected_rows}]}
-                print(d)
                 self.disconnect()
                 return d
             else:
                 d = {"ok": False,
                     "message": "No row found with that id",
                     "data": None}
-                print(d)
                 self.disconnect()
                 return d
         except Exception as e:
@@ -174,7 +163,6 @@ class DbPsycopg():
             d = {"ok": False,
                 "message": str(e),
                 "data": None}
-            print(d)
             self.disconnect()
             return d
 

@@ -3,6 +3,9 @@ from p1_psycopg.parks.parks import Parks
 from p1_psycopg.trees.trees import Trees
 from p1_psycopg.corridors.corridors import Corridors
 
+import dicts
+
+
 # para ejecutar
 #Directorio: 
 # python main_pg.py parks insert
@@ -10,14 +13,7 @@ from p1_psycopg.corridors.corridors import Corridors
 # python main_pg.py parks selectAsDict
 # python main_pg.py parks selectAsTuple
 
-park_insert_dict ={
-           'description':'My first dict park',
-           'area':1250,
-           'type':'Historic',
-           'management':'Municipal',
-           'equipment':True,
-           'geom':'POLYGON ((728610.8752566403709352 4373481.97025651764124632, 728645.17159836390055716 4373470.94643239211291075, 728633.97279290307778865 4373438.22492268681526184, 728600.5513578561367467 4373449.42372814752161503, 728610.8752566403709352 4373481.97025651764124632))'
-}
+park_insert_dict = dicts.park_insert_3
 park_select_dict = {'id':10}
 park_update_dict = {
            'id':31,
@@ -91,41 +87,41 @@ def main():
     if tableName == "parks":
         b=Parks()
         if functionName=="insert":
-            b.insert(park_insert_dict)
+            print(b.insert(park_insert_dict))
         elif functionName=="selectAsTuple":
-            b.select(park_select_dict)
+            print(b.select(park_select_dict))
         elif functionName=="selectAsDict":
-            b.select(park_select_dict,asDict=True)
+            print(b.select(park_select_dict,asDict=True))
         elif functionName=="update":
-            b.update(park_update_dict)
+            print(b.update(park_update_dict))
         elif functionName=="delete":
-            b.delete(park_delete_dict)
+            print(b.delete(park_delete_dict))
 
     elif tableName=="trees":
         b=Trees()
         if functionName=="insert":
-            b.insert(tree_insert_dict)
+            print(b.insert(tree_insert_dict))
         elif functionName=="selectAsTuple":
-            b.select(tree_select_dict)
+            print(b.select(tree_select_dict))
         elif functionName=="selectAsDict":
-            b.select(tree_select_dict,asDict=True)
+            print(b.select(tree_select_dict,asDict=True))
         elif functionName=="update":
-            b.update(tree_update_dict)
+            print(b.update(tree_update_dict))
         elif functionName=="delete":
-            b.delete(tree_delete_dict)
+            print(b.delete(tree_delete_dict))
 
     elif tableName=="corridors":
         b=Corridors()
         if functionName=="insert":
-            b.insert(corr_insert_dict)
+            print(b.insert(corr_insert_dict))
         elif functionName=="selectAsTuple":
-            b.select(corr_select_dict)
+            print(b.select(corr_select_dict))
         elif functionName=="selectAsDict":
-            b.select(corr_select_dict, asDict=True)
+           print(b.select(corr_select_dict, asDict=True))
         elif functionName=="update":
-            b.update(corr_update_dict)
+            print(b.update(corr_update_dict))
         elif functionName=="delete":
-            b.delete(corr_delete_dict)
+            print(b.delete(corr_delete_dict))
 
 if __name__ == "__main__":
     main()
