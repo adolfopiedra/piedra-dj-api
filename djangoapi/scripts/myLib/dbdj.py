@@ -191,7 +191,7 @@ class DbDjango():
                     select id from {table} where ST_relate(
                         geom,
                         %s,
-                        'T********') and id != %s
+                        '{matrix}') and id != %s
                 """
             self.cur.execute(query,[geom,id])
         else:
