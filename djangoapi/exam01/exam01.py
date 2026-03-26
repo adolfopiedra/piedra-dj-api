@@ -36,3 +36,5 @@ def insert():
     conn.close()
 
     print("Inserted")
+
+## Conexión a la base de datos usando django models

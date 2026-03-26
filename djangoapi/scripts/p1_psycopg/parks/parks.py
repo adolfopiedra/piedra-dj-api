@@ -7,7 +7,7 @@ class Parks(Db):
     def __init__(self):
         super().__init__()
         self.table = 'apm.parks'
-        self.fields = 'id, description, area, type, management, equipment, st_astext(geom)'
+        self.fields = 'id, description, area, type, management, equipment, st_astext(geom) as geom, st_asgeojson(geom) as geojson, geom as geom_binary'
         
     def insert(self,dict):
         Db.is_valid(self,dict['geom'])
