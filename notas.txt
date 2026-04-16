@@ -1,0 +1,10 @@
+url--> datos(POST/GET) --> View (request.POST
+                                 request.GET) --> data dict
+
+                                 --> Our function
+
+url (POST->dict) --> View <-- import insert
+                                     insert(request.POST)
+
+infraverde/insert/ --> Vista --> Insert --> {ok,message, data}
+                                    
