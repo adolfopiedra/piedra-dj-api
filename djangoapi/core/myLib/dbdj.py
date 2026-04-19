@@ -4,7 +4,6 @@ from django.forms.models import model_to_dict
 from django.db import connection
 from django.contrib.gis.geos import GEOSGeometry
 
-from scripts.myLib.p1Settings import EPSG_CODE, SNAPTOGRIDDEC
 from djangoapi.settings import EPSG_FOR_GEOMETRIES, ST_SNAP_PRECISION
 
 
@@ -36,13 +35,22 @@ class DbDjango():
                     "data": None}
                 return d
     
-    def selectallAsDicts(self,model):
-        l=model.objects.all()
-        data=[]
+    def selectallAsDicts(self, model):
+        l = model.objects.all()
+        data = []
+        if len(l) == 0:
+            d = {'ok': False, 'Message': f"No {model.__name__} exist",
+                    'data': None}
+            return d
+
         for b in l:
-            dict=model_to_dict(b)
-            data.append(dict)
-        d = {'ok':True, 'message': 'Data retrieved', 'data': data}
+            d = model_to_dict(b)
+            g = GEOSGeometry(d['geom'], srid=EPSG_FOR_GEOMETRIES)
+            d['geom'] = g.wkt
+            d['data_creation'] = d['data_creation'].strftime("%Y-%m-%d %H:%M:%S")
+            data.append(d)
+        d = {'ok': True, 'Message': f"Retriewed {model.__name__}: {len(l)}",
+                'data': data}
         return d
 
     def delete(self,model,dict):
@@ -70,7 +78,7 @@ class DbDjango():
             snapped_wkb_geometry = self.geomToSnappedWkb(dict['geom'])
 
             #Create GEOS Geometry Object
-            g = GEOSGeometry(snapped_wkb_geometry, srid=EPSG_CODE)
+            g = GEOSGeometry(snapped_wkb_geometry, srid=EPSG_FOR_GEOMETRIES)
 
             #Check if GEOS Geometry is valid:
             if not g.valid:
@@ -127,7 +135,7 @@ class DbDjango():
             snapped_wkb_geometry = self.geomToSnappedWkb(dict['geom'])
             
             #Create GEOS Geometry Object
-            g = GEOSGeometry(snapped_wkb_geometry, srid=EPSG_CODE)
+            g = GEOSGeometry(snapped_wkb_geometry, srid=EPSG_FOR_GEOMETRIES)
 
             #Check if GEOS Geometry is valid:
             if not g.valid:
@@ -181,7 +189,7 @@ class DbDjango():
     def geomToSnappedWkb(self,geom):
         '''WKT to Snapped WKB'''
         query="select st_snaptogrid(st_geomfromtext(%s, %s),%s)"
-        self.cur.execute(query, [geom,EPSG_CODE, SNAPTOGRIDDEC])
+        self.cur.execute(query, [geom,EPSG_FOR_GEOMETRIES, ST_SNAP_PRECISION])
         snapped_wkb_geometry=self.cur.fetchall()[0][0]
         #print(f'snapped_wkb_geometry: {snapped_wkb_geometry}')
         return snapped_wkb_geometry

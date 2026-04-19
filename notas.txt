@@ -7,4 +7,15 @@ url (POST->dict) --> View <-- import insert
                                      insert(request.POST)
 
 infraverde/insert/ --> Vista --> Insert --> {ok,message, data}
+
+http://localhost:8000/infraverde/hello_infraverde/?variable=valor&variable=valor
+
+http://localhost:8000/infraverde/hello_infraverde/
+
+    # def post(self, request):
+    #     d=request.POST.dict()
+    #     return JsonResponse({"ok":True,"message": "Datos Recibidos en Parks (post)", "data":[request.POST.dict()]},status=200)
+
+    # def get(self, request):
+    #     return JsonResponse({"ok":True,"message": "Datos Recibidos en Parks (get)", "data":[request.GET.dict()]},status=200)
                                     

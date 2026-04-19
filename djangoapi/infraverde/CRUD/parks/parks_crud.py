@@ -4,9 +4,8 @@ from django.http import JsonResponse
 from django.db import connection
 from django.forms.models import model_to_dict
 
-from scripts.myLib.dbdj import DbDjango as dbdj
 from infraverde.models import Parks
-
+from core.myLib.dbdj import DbDjango as dbdj
 
 class Parks_crud(dbdj):
     def __init__(self):

@@ -1,5 +1,5 @@
 from django.contrib.gis.geos import GEOSGeometry
-from scripts.myLib.dbdj import DbDjango as dbdj
+from core.myLib.dbdj import DbDjango as dbdj
 from infraverde.models import Trees
 from django.http import JsonResponse
 
