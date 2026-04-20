@@ -81,7 +81,7 @@ class BaseDjangoView(View):
             id = kwargs.get('id')
             return self.delete(id)
         else:
-            JsonResponse({"message": "Invalid operation option"}, status=400)
+            return JsonResponse({"message": "Invalid operation option"}, status=400)
     
     #GET OPERATIONS
     def selectone(self, id):
