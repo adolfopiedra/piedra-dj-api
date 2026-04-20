@@ -18,4 +18,7 @@ http://localhost:8000/infraverde/hello_infraverde/
 
     # def get(self, request):
     #     return JsonResponse({"ok":True,"message": "Datos Recibidos en Parks (get)", "data":[request.GET.dict()]},status=200)
+
+
+          
                                     
