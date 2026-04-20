@@ -1,4 +1,4 @@
-url--> datos(POST/GET) --> View (request.POST
+rl--> datos(POST/GET) --> View (request.POST
                                  request.GET) --> data dict
 
                                  --> Our function
