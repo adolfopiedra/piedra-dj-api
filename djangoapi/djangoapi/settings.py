@@ -57,9 +57,7 @@ else:
     # Si la variable no existe, asigna una lista vacía para seguridad
     ALLOWED_HOSTS = []
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://piedra.geomaticaupv.es",
-]
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
