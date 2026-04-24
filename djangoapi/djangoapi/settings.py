@@ -57,6 +57,12 @@ else:
     # Si la variable no existe, asigna una lista vacía para seguridad
     ALLOWED_HOSTS = []
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://piedra.geomaticaupv.es",
+]
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 # Application definition
 
 INSTALLED_APPS = [
