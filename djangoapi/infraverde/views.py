@@ -17,9 +17,32 @@ from infraverde.CRUD.trees.trees_crud import Trees_crud
 
 class Infraverde01(View):
     def get(self, request):
-        return JsonResponse({"ok":True,"message": "Infraverde. Hello world", "data":[request.GET.dict()]},status=200)
+        return JsonResponse({
+            "ok": True,
+            "message": "Infraverde. GET. Hello world",
+            "data": [request.GET.dict()]
+        }, status=200)
+
     def post(self, request):
-        return JsonResponse({"ok":True,"message": "Infraverde. Hello world", "data":[request.POST.dict()]},status=200)
+
+        body_data = {}
+
+        # Caso 1: form-data o x-www-form-urlencoded
+        if request.POST:
+            body_data = request.POST.dict()
+
+        # Caso 2: raw JSON
+        else:
+            try:
+                body_data = json.loads(request.body.decode("utf-8"))
+            except:
+                body_data = {}
+
+        return JsonResponse({
+            "ok": True,
+            "message": "Infraverde. POST. Hello world",
+            "data": [body_data]
+        }, status=200)
 
 class Parks(BaseDjangoView):
     #Constructor
