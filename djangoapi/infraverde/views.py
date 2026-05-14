@@ -60,13 +60,25 @@ class Parks(BaseDjangoView):
 
     #POST OPERATIONS
     def insert(self, request):
-        dict = json.loads(request.body)
-        r = self.p.insert(dict)
+        body_data = {}
+        #CASO 1: form-data o x-www-form-urlencoded
+        if request.POST:
+            body_data = request.POST.dict()
+        #CASO 2: raw json
+        else:
+            body_data=json.loads(request.body)
+        r = self.p.insert(body_data)
         return JsonResponse(r)
     
     def update(self, request, id):
-        dict = json.loads(request.body)
-        r = self.p.update(dict)
+        body_data = {}
+        #CASO 1: form-data o x-www-form-urlencoded
+        if request.POST:
+            body_data = request.POST.dict()
+        #CASO 2: raw json
+        else:
+            body_data=json.loads(request.body)
+        r = self.p.update(body_data)
         return JsonResponse(r)
     
     def delete(self, id):
@@ -89,13 +101,25 @@ class Corridors(BaseDjangoView):
 
     #POST OPERATIONS
     def insert(self, request):
-        dict = json.loads(request.body)
-        r = self.c.insert(dict)
+        body_data = {}
+        #CASO 1: form-data o x-www-form-urlencoded
+        if request.POST:
+            body_data = request.POST.dict()
+        #CASO 2: raw json
+        else:
+            body_data=json.loads(request.body)
+        r = self.c.insert(body_data)
         return JsonResponse(r)
     
     def update(self, request, id):
-        dict = json.loads(request.body)
-        r = self.c.update(dict)
+        body_data = {}
+        #CASO 1: form-data o x-www-form-urlencoded
+        if request.POST:
+            body_data = request.POST.dict()
+        #CASO 2: raw json
+        else:
+            body_data=json.loads(request.body)
+        r = self.c.update(body_data)
         return JsonResponse(r)
     
     def delete(self, id):
@@ -118,13 +142,25 @@ class Trees(BaseDjangoView):
 
     #POST OPERATIONS
     def insert(self, request):
-        dict = json.loads(request.body)
-        r = self.c.insert(dict)
+        body_data = {}
+        #CASO 1: form-data o x-www-form-urlencoded
+        if request.POST:
+            body_data = request.POST.dict()
+        #CASO 2: raw json
+        else:
+            body_data=json.loads(request.body)
+        r = self.c.insert(body_data)
         return JsonResponse(r)
     
     def update(self, request, id):
-        dict = json.loads(request.body)
-        r = self.c.update(dict)
+        body_data = {}
+        #CASO 1: form-data o x-www-form-urlencoded
+        if request.POST:
+            body_data = request.POST.dict()
+        #CASO 2: raw json
+        else:
+            body_data=json.loads(request.body)
+        r = self.c.update(body_data)
         return JsonResponse(r)
     
     def delete(self, id):
