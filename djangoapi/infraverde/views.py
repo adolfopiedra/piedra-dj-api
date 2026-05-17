@@ -67,6 +67,17 @@ class Parks(BaseDjangoView):
         #CASO 2: raw json
         else:
             body_data=json.loads(request.body)
+
+        equipment_raw = body_data.get('equipment', False)
+
+        if equipment_raw in [True, 'true', 'True', 'TRUE', '1', 1]:
+            body_data['equipment'] = True
+        elif equipment_raw in [False, 'false', 'False', 'FALSE', '0', 0]:
+            body_data['equipment'] = False
+        else:
+            body_data['equipment'] = None
+
+
         r = self.p.insert(body_data)
         return JsonResponse(r)
     
@@ -78,6 +89,16 @@ class Parks(BaseDjangoView):
         #CASO 2: raw json
         else:
             body_data=json.loads(request.body)
+
+        equipment_raw = body_data.get('equipment', False)
+
+        if equipment_raw in [True, 'true', 'True', 'TRUE', '1', 1]:
+            body_data['equipment'] = True
+        elif equipment_raw in [False, 'false', 'False', 'FALSE', '0', 0]:
+            body_data['equipment'] = False
+        else:
+            body_data['equipment'] = None
+
         r = self.p.update(body_data)
         return JsonResponse(r)
     
@@ -108,6 +129,16 @@ class Corridors(BaseDjangoView):
         #CASO 2: raw json
         else:
             body_data=json.loads(request.body)
+
+        lighting_raw = body_data.get('lighting', False)
+
+        if lighting_raw in [True, 'true', 'True', 'TRUE', '1', 1]:
+            body_data['lighting'] = True
+        elif lighting_raw in [False, 'false', 'False', 'FALSE', '0', 0]:
+            body_data['lighting'] = False
+        else:
+            body_data['lighting'] = None
+
         r = self.c.insert(body_data)
         return JsonResponse(r)
     
@@ -119,6 +150,16 @@ class Corridors(BaseDjangoView):
         #CASO 2: raw json
         else:
             body_data=json.loads(request.body)
+
+        lighting_raw = body_data.get('lighting', False)
+
+        if lighting_raw in [True, 'true', 'True', 'TRUE', '1', 1]:
+            body_data['lighting'] = True
+        elif lighting_raw in [False, 'false', 'False', 'FALSE', '0', 0]:
+            body_data['lighting'] = False
+        else:
+            body_data['lighting'] = None
+
         r = self.c.update(body_data)
         return JsonResponse(r)
     
@@ -149,6 +190,16 @@ class Trees(BaseDjangoView):
         #CASO 2: raw json
         else:
             body_data=json.loads(request.body)
+        
+        is_protected_raw = body_data.get('is_protected', False)
+
+        if is_protected_raw in [True, 'true', 'True', 'TRUE', '1', 1]:
+            body_data['is_protected'] = True
+        elif is_protected_raw in [False, 'false', 'False', 'FALSE', '0', 0]:
+            body_data['is_protected'] = False
+        else:
+            body_data['is_protected'] = None
+
         r = self.c.insert(body_data)
         return JsonResponse(r)
     
@@ -160,6 +211,16 @@ class Trees(BaseDjangoView):
         #CASO 2: raw json
         else:
             body_data=json.loads(request.body)
+
+        is_protected_raw = body_data.get('is_protected', False)
+
+        if is_protected_raw in [True, 'true', 'True', 'TRUE', '1', 1]:
+            body_data['is_protected'] = True
+        elif is_protected_raw in [False, 'false', 'False', 'FALSE', '0', 0]:
+            body_data['is_protected'] = False
+        else:
+            body_data['is_protected'] = None
+
         r = self.c.update(body_data)
         return JsonResponse(r)
     

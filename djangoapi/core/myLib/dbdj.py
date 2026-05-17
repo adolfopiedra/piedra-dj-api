@@ -39,7 +39,7 @@ class DbDjango():
         l = model.objects.all()
         data = []
         if len(l) == 0:
-            d = {'ok': False, 'Message': f"No {model.__name__} exist",
+            d = {'ok': False, 'message': f"No {model.__name__} exist",
                     'data': None}
             return d
 
@@ -49,7 +49,7 @@ class DbDjango():
             d['geom'] = g.wkt
             d['data_creation'] = d['data_creation'].strftime("%Y-%m-%d %H:%M:%S")
             data.append(d)
-        d = {'ok': True, 'Message': f"Retriewed {model.__name__}: {len(l)}",
+        d = {'ok': True, 'message': f"Retriewed {model.__name__}: {len(l)}",
                 'data': data}
         return d
 
@@ -103,7 +103,7 @@ class DbDjango():
                 intersections = self.st_relate(table,snapped_wkb_geometry,'T********')
             if intersections:
                 d = {'ok': False, 
-                    'message':'The geometry interior intersects with the following geometries id',
+                    'message':f'The geometry interior intersects with the following geometries id: {" ".join([str(id) for id in intersections])}',
                     'data': intersections}
                 return d
             #Insert the data
@@ -159,7 +159,7 @@ class DbDjango():
                 intersections = self.st_relate(table,snapped_wkb_geometry,'T********',dict['id'], update=True)
             if intersections:
                     d = {'ok': False, 
-                        'message':'The geometry interior intersects with the following geometries id',
+                        'message':f'The geometry interior intersects with the following geometries id: {" ".join([str(id) for id in intersections])}',
                         'data': intersections}
                     return d
             #Recalc area, dist and data creation
