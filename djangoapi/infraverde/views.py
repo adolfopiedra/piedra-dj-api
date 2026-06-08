@@ -15,6 +15,9 @@ from infraverde.CRUD.parks.parks_crud import Parks_crud
 from infraverde.CRUD.corridors.corridors_crud import Corridors_crud
 from infraverde.CRUD.trees.trees_crud import Trees_crud
 
+#To allow user autenticated
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 class Infraverde01(View):
     def get(self, request):
         return JsonResponse({
@@ -44,7 +47,10 @@ class Infraverde01(View):
             "data": [body_data]
         }, status=200)
 
-class Parks(BaseDjangoView):
+class Parks(LoginRequiredMixin, BaseDjangoView):
+    #url login
+    login_url = '/core/not_loggedin/'
+
     #Constructor
     def __init__(self):
         self.p=Parks_crud()
@@ -106,7 +112,10 @@ class Parks(BaseDjangoView):
         r = self.p.delete({'id': id})
         return JsonResponse(r)
 
-class Corridors(BaseDjangoView):
+class Corridors(LoginRequiredMixin, BaseDjangoView):
+    #url login
+    login_url = '/core/not_loggedin/'
+
     #Constructor
     def __init__(self):
         self.c=Corridors_crud()
@@ -167,7 +176,9 @@ class Corridors(BaseDjangoView):
         r = self.c.delete({'id': id})
         return JsonResponse(r)
 
-class Trees(BaseDjangoView):
+class Trees(LoginRequiredMixin, BaseDjangoView):
+    #url login
+    login_url = '/core/not_loggedin/'
     #Constructor
     def __init__(self):
         self.c=Trees_crud()

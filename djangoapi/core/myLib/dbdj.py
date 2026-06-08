@@ -89,6 +89,18 @@ class DbDjango():
                 return d
             print('Valid Geometry')
 
+            # Check if LineString crosses itself
+            if g.geom_type == 'LineString':
+                is_simple = self.st_is_simple(snapped_wkb_geometry)
+
+                if not is_simple:
+                    d = {
+                        'ok': False,
+                        'message': 'The LineString intersects itself',
+                        'data': None
+                    }
+                    return d
+
             #Check intersections with another geometry in the same layer:
             if g.geom_type in ['Polygon','LineString']:
                 intersections = self.st_relate(table,snapped_wkb_geometry,'T********')
@@ -144,6 +156,18 @@ class DbDjango():
                 'data':None}
                 return d
             print('Valid Geometry')
+
+            # Check if LineString crosses itself
+            if g.geom_type == 'LineString':
+                is_simple = self.st_is_simple(snapped_wkb_geometry)
+
+                if not is_simple:
+                    d = {
+                        'ok': False,
+                        'message': 'The LineString intersects itself',
+                        'data': None
+                    }
+                    return d
             
             #Check intersections with another geometry in the same layer:
             if g.geom_type in ['Polygon','LineString']:
@@ -224,5 +248,10 @@ class DbDjango():
         self.cur.execute(query,[g])
         return self.cur.fetchall()
         
-        
+    def st_is_simple(self, geom):
+        query = """
+            SELECT ST_IsSimple(%s)
+        """
+        self.cur.execute(query, [geom])
+        return self.cur.fetchone()[0]
          
