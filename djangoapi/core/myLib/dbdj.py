@@ -3,6 +3,7 @@
 from django.forms.models import model_to_dict
 from django.db import connection
 from django.contrib.gis.geos import GEOSGeometry
+from django.db.models import ForeignKey
 
 from djangoapi.settings import EPSG_FOR_GEOMETRIES, ST_SNAP_PRECISION
 
@@ -10,6 +11,24 @@ from djangoapi.settings import EPSG_FOR_GEOMETRIES, ST_SNAP_PRECISION
 class DbDjango():
     def __init__(self):
         self.cur=connection.cursor()
+
+    def prepareForeignKeys(self, model, data):
+        for field in model._meta.fields:
+
+            if isinstance(field, ForeignKey) and field.name in data:
+
+                value = data.pop(field.name)
+
+                if value is None or value == '' or value == 'null' or value == 'undefined':
+                    data[field.attname] = None
+
+                elif isinstance(value, dict):
+                    data[field.attname] = int(value.get('id'))
+
+                else:
+                    data[field.attname] = int(value)
+
+        return data
 
     def select(self,model,dict,asDict):
         try:
@@ -124,6 +143,8 @@ class DbDjango():
             elif g.geom_type == 'LineString':
                 dict['dist']=g.length
             dict['geom']=g
+            # Convert ForeignKey fields: type -> type_id, management -> management_id, etc.
+            dict = self.prepareForeignKeys(model, dict)
             p = model(**dict)
             p.save()
 
@@ -192,6 +213,10 @@ class DbDjango():
             elif g.geom_type == 'LineString':
                 dict['dist']=g.length
             dict['geom']=g 
+
+            # Convert ForeignKey fields: type -> type_id, management -> management_id, etc.
+            dict = self.prepareForeignKeys(model, dict)
+            
             #Execute Update
             p = model.objects.filter(id=dict['id']).update(**dict)
             if p:

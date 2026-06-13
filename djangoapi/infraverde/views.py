@@ -17,6 +17,18 @@ from infraverde.CRUD.trees.trees_crud import Trees_crud
 
 #To allow user autenticated
 from django.contrib.auth.mixins import LoginRequiredMixin
+from core.permissions import json_permission_required
+
+def get_fk_id(data, field_name):
+    value = data.get(field_name)
+
+    if value is None or value == '' or value == 'null' or value == 'undefined':
+        return None
+
+    if isinstance(value, dict):
+        value = value.get('id')
+
+    return int(value)
 
 class Infraverde01(View):
     def get(self, request):
@@ -56,15 +68,18 @@ class Parks(LoginRequiredMixin, BaseDjangoView):
         self.p=Parks_crud()
 
     #GET OPERATIONS
+    @json_permission_required("infraverde.view_parks")
     def selectone(self, id):
         r = self.p.select({'id': id},asDict=True)
         return JsonResponse(r)
 
+    @json_permission_required("infraverde.view_parks")
     def selectall(self):
         r = self.p.selectallAsDicts()
         return JsonResponse(r)
 
     #POST OPERATIONS
+    @json_permission_required("infraverde.add_parks")
     def insert(self, request):
         body_data = {}
         #CASO 1: form-data o x-www-form-urlencoded
@@ -87,6 +102,7 @@ class Parks(LoginRequiredMixin, BaseDjangoView):
         r = self.p.insert(body_data)
         return JsonResponse(r)
     
+    @json_permission_required("infraverde.change_parks")
     def update(self, request, id):
         body_data = {}
         #CASO 1: form-data o x-www-form-urlencoded
@@ -108,6 +124,7 @@ class Parks(LoginRequiredMixin, BaseDjangoView):
         r = self.p.update(body_data)
         return JsonResponse(r)
     
+    @json_permission_required("infraverde.delete_parks")
     def delete(self, id):
         r = self.p.delete({'id': id})
         return JsonResponse(r)
@@ -121,15 +138,18 @@ class Corridors(LoginRequiredMixin, BaseDjangoView):
         self.c=Corridors_crud()
 
     #GET OPERATIONS
+    @json_permission_required("infraverde.view_corridors")
     def selectone(self, id):
         r = self.c.select({'id': id},asDict=True)
         return JsonResponse(r)
 
+    @json_permission_required("infraverde.view_corridors")
     def selectall(self):
         r = self.c.selectallAsDicts()
         return JsonResponse(r)
 
     #POST OPERATIONS
+    @json_permission_required("infraverde.add_corridors")
     def insert(self, request):
         body_data = {}
         #CASO 1: form-data o x-www-form-urlencoded
@@ -150,7 +170,7 @@ class Corridors(LoginRequiredMixin, BaseDjangoView):
 
         r = self.c.insert(body_data)
         return JsonResponse(r)
-    
+    @json_permission_required("infraverde.change_corridors")
     def update(self, request, id):
         body_data = {}
         #CASO 1: form-data o x-www-form-urlencoded
@@ -171,7 +191,7 @@ class Corridors(LoginRequiredMixin, BaseDjangoView):
 
         r = self.c.update(body_data)
         return JsonResponse(r)
-    
+    @json_permission_required("infraverde.delete_corridors")
     def delete(self, id):
         r = self.c.delete({'id': id})
         return JsonResponse(r)
@@ -184,15 +204,18 @@ class Trees(LoginRequiredMixin, BaseDjangoView):
         self.c=Trees_crud()
 
     #GET OPERATIONS
+    @json_permission_required("infraverde.view_trees")
     def selectone(self, id):
         r = self.c.select({'id': id},asDict=True)
         return JsonResponse(r)
 
+    @json_permission_required("infraverde.view_trees")
     def selectall(self):
         r = self.c.selectallAsDicts()
         return JsonResponse(r)
 
     #POST OPERATIONS
+    @json_permission_required("infraverde.add_trees")
     def insert(self, request):
         body_data = {}
         #CASO 1: form-data o x-www-form-urlencoded
@@ -214,6 +237,7 @@ class Trees(LoginRequiredMixin, BaseDjangoView):
         r = self.c.insert(body_data)
         return JsonResponse(r)
     
+    @json_permission_required("infraverde.change_trees")
     def update(self, request, id):
         body_data = {}
         #CASO 1: form-data o x-www-form-urlencoded
@@ -235,6 +259,7 @@ class Trees(LoginRequiredMixin, BaseDjangoView):
         r = self.c.update(body_data)
         return JsonResponse(r)
     
+    @json_permission_required("infraverde.delete_trees")
     def delete(self, id):
         r = self.c.delete({'id': id})
         return JsonResponse(r)
